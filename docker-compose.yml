@@ -1,34 +1,50 @@
+# docker-compose.yml: file that let us set up various containers to automatically
+# run with a single command "docker-compose.up"
+
 version: "3.8"
+# this services define various containers will be used in development
+# here there are two containers: reverse-proxy and account
 services:
+    # traffic tool that handle the routing of url
     reverse-proxy:
         # The official v2 Traefik docker image
         image: traefik:v2.2
         # Enables the web UI and tells Traefik to listen to docker
         command:
+            # allow use http without tls
             - "--api.insecure=true"
+            # this reverse proxy needs look into other docker containers to route traffic to
             - "--providers.docker"
+            # not expose every docker containers by default
             - "--providers.docker.exposedByDefault=false"
+        # set up port want to expose
         ports:
-        # The HTTP port
+        # list 2 ports. Left is port on our host machine. Right is port on inside of the container
             - "80:80"
         # The Web UI (enabled by --api.insecure=true)
             - "8080:8080"
         volumes:
         # So that Traefik can listen to the Docker events
             - /var/run/docker.sock:/var/run/docker.sock
+    # it hosts docker container made in account/Dockerfile
     account:
         build:
             context: ./account
+            # builder is the name of the first stage in the account/Dockerfile
             target: builder
+        # give image name
         image: account
         expose:
             - "8080"
+        # labels tells traffic to look for this container
         labels:
             - "traefik.enable=true"
             - "traefik.http.routers.account.rule=Host(`malcorp.test`) && PathPrefix(`/api/account`)"
+        # sets and environment variable inside of container
         environment:
             - ENV=dev
         volumes:
+            # map folders inside /account into folder inside container
             - ./account:/go/src/app
         # have to use $$ (double-dollar) so docker doesn't try to substitute a variable
         command: reflex -r "\.go$$" -s -- sh -c "go run ./
