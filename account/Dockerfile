@@ -12,7 +12,7 @@ ENV GO111MODULE=on
 
 # bash command Run to run inside container
 # Get Reflex for live reloading for the app - (re-run server when files change)
-RUN go get github.com/cespare/reflex
+RUN go install github.com/cespare/reflex@latest
 
 # copy go.mod and go.sum to container
 COPY go.mod .

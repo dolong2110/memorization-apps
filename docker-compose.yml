@@ -1,6 +1,3 @@
-# docker-compose.yml: file that let us set up various containers to automatically
-# run with a single command "docker-compose.up"
-
 version: "3.8"
 # this services define various containers will be used in development
 # here there are two containers: reverse-proxy and account
@@ -34,6 +31,8 @@ services:
             target: builder
         # give image name
         image: account
+        # add env file to container
+        env_file: .env.dev
         expose:
             - "8080"
         # labels tells traffic to look for this container
@@ -47,4 +46,4 @@ services:
             # map folders inside /account into folder inside container
             - ./account:/go/src/app
         # have to use $$ (double-dollar) so docker doesn't try to substitute a variable
-        command: reflex -r "\.go$$" -s -- sh -c "go run ./
+        command: reflex -r "\.go$$" -s -- sh -c "go run ./"

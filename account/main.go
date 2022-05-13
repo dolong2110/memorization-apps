@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/dolong2110/Memoirization-Apps/handler"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,10 +19,8 @@ func main() {
 
 	router := gin.Default()
 
-	router.GET("/api/account", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"hello": "long",
-		})
+	handler.NewHandler(&handler.Config{
+		R: router,
 	})
 
 	srv := &http.Server{
