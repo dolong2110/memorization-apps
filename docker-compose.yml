@@ -16,13 +16,27 @@ services:
             - "--providers.docker.exposedByDefault=false"
         # set up port want to expose
         ports:
-        # list 2 ports. Left is port on our host machine. Right is port on inside of the container
+        # The HTTP port. List 2 ports. Left is port on our host machine. Right is port on inside of the container
             - "80:80"
         # The Web UI (enabled by --api.insecure=true)
             - "8080:8080"
         volumes:
         # So that Traefik can listen to the Docker events
             - /var/run/docker.sock:/var/run/docker.sock
+    # set up postgres db in the container
+    postgres-auth:
+        image: "postgres:alpine"
+        environment:
+            - POSTGRES_PASSWORD=password
+        ports:
+            - "5432:5432"
+        #   Set a volume for data and initial sql script
+        #   May configure initial db for future demo
+        volumes:
+            # here uses volume pgdata_auth -> need create volume key at bottom of this file to be able to use this
+            - "pgdata_auth:/var/lib/postgresql/data"
+            # - ./init:/docker-entrypoint-initdb.d/
+        command: [ "postgres", "-c", "log_statement=all" ]
     # it hosts docker container made in account/Dockerfile
     account:
         build:
@@ -45,5 +59,10 @@ services:
         volumes:
             # map folders inside /account into folder inside container
             - ./account:/go/src/app
+        # the account container must depend on the postgres container
+        depends_on:
+            -   postgres-auth
         # have to use $$ (double-dollar) so docker doesn't try to substitute a variable
         command: reflex -r "\.go$$" -s -- sh -c "go run ./"
+volumes:
+    pgdata_auth:
