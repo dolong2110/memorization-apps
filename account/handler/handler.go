@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"github.com/dolong2110/Memoirization-Apps/model"
+	"github.com/dolong2110/Memoirization-Apps/account/model"
 	"net/http"
 	"os"
 
@@ -44,15 +44,6 @@ func NewHandler(c *Config) {
 		c.JSON(http.StatusOK, gin.H{
 			"hello": "space persons",
 		})
-	})
-}
-
-
-
-// Signup handler
-func (h *Handler) Signup(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"hello": "it's signup",
 	})
 }
 

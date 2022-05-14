@@ -30,4 +30,5 @@ docker-compose up
 cd account
 go run main.go
 go test -v ./handler # to test in handler layer
+go test ./... # test all
 ````

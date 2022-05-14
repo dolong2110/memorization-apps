@@ -3,9 +3,9 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/dolong2110/Memoirization-Apps/model"
-	"github.com/dolong2110/Memoirization-Apps/model/apperrors"
-	"github.com/dolong2110/Memoirization-Apps/model/mocks"
+	"github.com/dolong2110/Memoirization-Apps/account/model"
+	"github.com/dolong2110/Memoirization-Apps/account/model/apperrors"
+	"github.com/dolong2110/Memoirization-Apps/account/model/mocks"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"

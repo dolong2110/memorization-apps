@@ -9,7 +9,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/dolong2110/Memoirization-Apps/handler"
+	"github.com/dolong2110/Memoirization-Apps/account/handler"
 	"github.com/gin-gonic/gin"
 )
 
