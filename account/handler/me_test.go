@@ -25,7 +25,7 @@ func TestMe(t *testing.T) {
 		mockUserResp := &model.User{
 			UID:   uid,
 			Email: "bob@bob.com",
-			Name:  "Bobby Bobson",
+			Name:  "Bobby Boson",
 		}
 
 		mockUserService := new(mocks.MockUserService)
@@ -60,7 +60,7 @@ func TestMe(t *testing.T) {
 		})
 		assert.NoError(t, err)
 
-		assert.Equal(t, 200, rr.Code)
+		assert.Equal(t, http.StatusOK, rr.Code)
 		assert.Equal(t, respBody, rr.Body.Bytes())
 		mockUserService.AssertExpectations(t) // assert that UserService.Get was called
 	})
@@ -84,7 +84,7 @@ func TestMe(t *testing.T) {
 
 		router.ServeHTTP(rr, request)
 
-		assert.Equal(t, 500, rr.Code)
+		assert.Equal(t, http.StatusInternalServerError, rr.Code)
 		mockUserService.AssertNotCalled(t, "Get", mock.Anything)
 	})
 
