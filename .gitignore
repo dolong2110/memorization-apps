@@ -1,2 +1,4 @@
 .idea
 .env.dev
+*.pem
+.vscode
