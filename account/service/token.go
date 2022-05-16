@@ -8,45 +8,51 @@ import (
 	"log"
 )
 
-// TokenService used for injecting an implementation of TokenRepository
+// tokenService used for injecting an implementation of TokenRepository
 // for use in service methods along with keys and secrets for
 // signing JWTs
-type TokenService struct {
+type tokenService struct {
 	// TokenRepository model.TokenRepository
-	PrivKey       *rsa.PrivateKey
-	PubKey        *rsa.PublicKey
-	RefreshSecret string
+	PrivKey       		  *rsa.PrivateKey
+	PubKey        		  *rsa.PublicKey
+	RefreshSecret 		  string
+	IDExpirationSecs      int64
+	RefreshExpirationSecs int64
 }
 
 // TSConfig will hold repositories that will eventually be injected into this
 // this service layer
 type TSConfig struct {
 	// TokenRepository model.TokenRepository
-	PrivKey       *rsa.PrivateKey
-	PubKey        *rsa.PublicKey
-	RefreshSecret string
+	PrivKey       		  *rsa.PrivateKey
+	PubKey        		  *rsa.PublicKey
+	RefreshSecret 		  string
+	IDExpirationSecs      int64
+	RefreshExpirationSecs int64
 }
 
 // NewTokenService is a factory function for
 // initializing a UserService with its repository layer dependencies
 func NewTokenService(c *TSConfig) model.TokenService {
-	return &TokenService{
+	return &tokenService{
 		PrivKey:       c.PrivKey,
 		PubKey:        c.PubKey,
 		RefreshSecret: c.RefreshSecret,
+		IDExpirationSecs:      c.IDExpirationSecs,
+		RefreshExpirationSecs: c.RefreshExpirationSecs,
 	}
 }
 
-func (s *TokenService) NewPairFromUser(ctx context.Context, user *model.User, prevTokenID string) (*model.Token, error) {
+func (s *tokenService) NewPairFromUser(ctx context.Context, user *model.User, prevTokenID string) (*model.Token, error) {
 	// No need to use a repository for idToken as it is unrelated to any data source
-	idToken, err := generateIDToken(user, s.PrivKey)
+	idToken, err := generateIDToken(user, s.PrivKey, s.IDExpirationSecs)
 
 	if err != nil {
 		log.Printf("Error generating idToken for uid: %v. Error: %v\n", user.UID, err.Error())
 		return nil, apperrors.NewInternal()
 	}
 
-	refreshToken, err := generateRefreshToken(user.UID, s.RefreshSecret)
+	refreshToken, err := generateRefreshToken(user.UID, s.RefreshSecret, s.RefreshExpirationSecs)
 
 	if err != nil {
 		log.Printf("Error generating refreshToken for uid: %v. Error: %v\n", user.UID, err.Error())

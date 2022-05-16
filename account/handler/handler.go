@@ -2,10 +2,8 @@ package handler
 
 import (
 	"github.com/dolong2110/Memoirization-Apps/account/model"
-	"net/http"
-	"os"
-
 	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 // Handler struct holds required services for handler to function
@@ -20,6 +18,7 @@ type Config struct {
 	R 			 *gin.Engine
 	UserService  model.UserService
 	TokenService model.TokenService
+	BaseURL		 string
 }
 
 // NewHandler initializes the handler with required injected services along with http routes
@@ -33,7 +32,7 @@ func NewHandler(c *Config) {
 	}
 
 	// Create a group, or base url for all routes
-	g := c.R.Group(os.Getenv("ACCOUNT_API_URL")) // Create a handler (which will later have injected services)
+	g := c.R.Group(c.BaseURL) // Create a handler (which will later have injected services)
 
 	g.GET("/me", h.Me)
 	g.POST("/signup", h.Signup)
