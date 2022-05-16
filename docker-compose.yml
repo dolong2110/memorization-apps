@@ -37,6 +37,12 @@ services:
             - "pgdata_account:/var/lib/postgresql/data"
             # - ./init:/docker-entrypoint-initdb.d/
         command: [ "postgres", "-c", "log_statement=all" ]
+    redis-account:
+        image: "redis:alpine"
+        ports:
+            - "6379:6379"
+        volumes:
+            - "redisdata:/data"
     # it hosts docker container made in account/Dockerfile
     account:
         build:
@@ -62,7 +68,9 @@ services:
         # the account container must depend on the postgres container
         depends_on:
             - postgres-account
+            - redis-account
         # have to use $$ (double-dollar) so docker doesn't try to substitute a variable
         command: reflex -r "\.go$$" -s -- sh -c "go run ./"
 volumes:
     pgdata_account:
+    redisdata:

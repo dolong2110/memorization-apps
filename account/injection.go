@@ -13,7 +13,6 @@ import (
 	"strconv"
 )
 
-// your imports here
 
 // will initialize a handler starting from data sources
 // which inject into repository layer
@@ -26,29 +25,30 @@ func inject(d *dataSources) (*gin.Engine, error) {
 	 * repository layer
 	 */
 	userRepository := repository.NewUserRepository(d.DB)
+	tokenRepository := repository.NewTokenRepository(d.RedisClient)
 
 	/*
-	 * repository layer
+	 * service layer
 	 */
 	userService := service.NewUserService(&service.USConfig{
 		UserRepository: userRepository,
 	})
 
 	// load rsa keys
-	privKeyFile := os.Getenv("PRIV_KEY_FILE")
-	priv, err := ioutil.ReadFile(privKeyFile)
+	privateKeyFile := os.Getenv("PRIVATE_KEY_FILE")
+	privateKeyByte, err := ioutil.ReadFile(privateKeyFile)
 
 	if err != nil {
 		return nil, fmt.Errorf("could not read private key pem file: %w", err)
 	}
 
-	privKey, err := jwt.ParseRSAPrivateKeyFromPEM(priv)
+	privateKey, err := jwt.ParseRSAPrivateKeyFromPEM(privateKeyByte)
 
 	if err != nil {
 		return nil, fmt.Errorf("could not parse private key: %w", err)
 	}
 
-	pubKeyFile := os.Getenv("PUB_KEY_FILE")
+	pubKeyFile := os.Getenv("PUBLIC_KEY_FILE")
 	pub, err := ioutil.ReadFile(pubKeyFile)
 
 	if err != nil {
@@ -78,10 +78,11 @@ func inject(d *dataSources) (*gin.Engine, error) {
 		return nil, fmt.Errorf("could not parse REFRESH_TOKEN_EXP as int: %w", err)
 	}
 
-	tokenService := service.NewTokenService(&service.TSConfig{
-		PrivKey:       		   privKey,
-		PubKey:        		   pubKey,
-		RefreshSecret: 		   refreshSecret,
+	tokenService := service.NewTokenService(&service.TokenServiceConfig{
+		TokenRepository:       tokenRepository,
+		PrivateKey:            privateKey,
+		PublicKey:             pubKey,
+		RefreshSecret:         refreshSecret,
 		IDExpirationSecs:      idExp,
 		RefreshExpirationSecs: refreshExp,
 	})
@@ -93,10 +94,10 @@ func inject(d *dataSources) (*gin.Engine, error) {
 	baseURL := os.Getenv("ACCOUNT_API_URL")
 
 	handler.NewHandler(&handler.Config{
-		R:            router,
+		Engine:       router,
 		UserService:  userService,
 		TokenService: tokenService,
-		BaseURL: 	  baseURL,
+		BaseURL:      baseURL,
 	})
 
 	return router, nil

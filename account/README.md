@@ -20,12 +20,20 @@ cd account
 go run main.go
 go test -v ./handler # to test in handler layer
 go test ./... # test all
+go test -v ./service -run NewPairFromUser # test exact method to reduce tests
 ````
 
 ## Authorization
 The app's authorization details is below
 
-![Aauthorization overview](authorization.png)
+![Authorization overview](authorization.png)
 
 ## Client tool to see the table
 In here I choose to use pgadmin4
+
+## Redis
+
+````
+redis-cli get {uid}:{jti} # jti: token id, uid and jti can be got from refresh token payload
+redis-cli TTL {uid}:{jti} # get the duration time of key in redis
+````

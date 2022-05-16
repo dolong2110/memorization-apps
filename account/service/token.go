@@ -5,6 +5,7 @@ import (
 	"crypto/rsa"
 	"github.com/dolong2110/Memoirization-Apps/account/model"
 	"github.com/dolong2110/Memoirization-Apps/account/model/apperrors"
+	"github.com/dolong2110/Memoirization-Apps/account/utils"
 	"log"
 )
 
@@ -12,32 +13,33 @@ import (
 // for use in service methods along with keys and secrets for
 // signing JWTs
 type tokenService struct {
-	// TokenRepository model.TokenRepository
-	PrivKey       		  *rsa.PrivateKey
-	PubKey        		  *rsa.PublicKey
-	RefreshSecret 		  string
+	TokenRepository       model.TokenRepository
+	PrivateKey            *rsa.PrivateKey
+	PublicKey             *rsa.PublicKey
+	RefreshSecret         string
 	IDExpirationSecs      int64
 	RefreshExpirationSecs int64
 }
 
-// TSConfig will hold repositories that will eventually be injected into this
+// TokenServiceConfig will hold repositories that will eventually be injected into
 // this service layer
-type TSConfig struct {
-	// TokenRepository model.TokenRepository
-	PrivKey       		  *rsa.PrivateKey
-	PubKey        		  *rsa.PublicKey
-	RefreshSecret 		  string
+type TokenServiceConfig struct {
+	TokenRepository       model.TokenRepository
+	PrivateKey            *rsa.PrivateKey
+	PublicKey             *rsa.PublicKey
+	RefreshSecret         string
 	IDExpirationSecs      int64
 	RefreshExpirationSecs int64
 }
 
 // NewTokenService is a factory function for
 // initializing a UserService with its repository layer dependencies
-func NewTokenService(c *TSConfig) model.TokenService {
+func NewTokenService(c *TokenServiceConfig) model.TokenService {
 	return &tokenService{
-		PrivKey:       c.PrivKey,
-		PubKey:        c.PubKey,
-		RefreshSecret: c.RefreshSecret,
+		TokenRepository:       c.TokenRepository,
+		PrivateKey:            c.PrivateKey,
+		PublicKey:             c.PublicKey,
+		RefreshSecret:         c.RefreshSecret,
 		IDExpirationSecs:      c.IDExpirationSecs,
 		RefreshExpirationSecs: c.RefreshExpirationSecs,
 	}
@@ -45,21 +47,30 @@ func NewTokenService(c *TSConfig) model.TokenService {
 
 func (s *tokenService) NewPairFromUser(ctx context.Context, user *model.User, prevTokenID string) (*model.Token, error) {
 	// No need to use a repository for idToken as it is unrelated to any data source
-	idToken, err := generateIDToken(user, s.PrivKey, s.IDExpirationSecs)
-
+	idToken, err := utils.GenerateIDToken(user, s.PrivateKey, s.IDExpirationSecs)
 	if err != nil {
 		log.Printf("Error generating idToken for uid: %v. Error: %v\n", user.UID, err.Error())
 		return nil, apperrors.NewInternal()
 	}
 
-	refreshToken, err := generateRefreshToken(user.UID, s.RefreshSecret, s.RefreshExpirationSecs)
-
+	refreshToken, err := utils.GenerateRefreshToken(user.UID, s.RefreshSecret, s.RefreshExpirationSecs)
 	if err != nil {
 		log.Printf("Error generating refreshToken for uid: %v. Error: %v\n", user.UID, err.Error())
 		return nil, apperrors.NewInternal()
 	}
 
-	// TODO: store refresh tokens by calling TokenRepository methods
+	// set freshly minted refresh token to valid list
+	if err := s.TokenRepository.SetRefreshToken(ctx, user.UID.String(), refreshToken.ID, refreshToken.ExpiresIn); err != nil {
+		log.Printf("Error storing tokenID for uid: %v. Error: %v\n", user.UID, err.Error())
+		return nil, apperrors.NewInternal()
+	}
+
+	// delete user's current refresh token (used when refreshing idToken)
+	if prevTokenID != "" {
+		if err := s.TokenRepository.DeleteRefreshToken(ctx, user.UID.String(), prevTokenID); err != nil {
+			log.Printf("Could not delete previous refreshToken for uid: %v, tokenID: %v\n", user.UID.String(), prevTokenID)
+		}
+	}
 
 	return &model.Token{
 		IDToken:      idToken,

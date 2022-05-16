@@ -1,4 +1,4 @@
-package service
+package utils
 
 import (
 	"crypto/rsa"
@@ -10,19 +10,13 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
-// IDTokenCustomClaims holds structure of jwt claims of idToken
-type IDTokenCustomClaims struct {
-	User *model.User `json:"user"`
-	jwt.StandardClaims
-}
-
-// generateIDToken generates an IDToken which is a jwt with myCustomClaims
+// GenerateIDToken generates an IDToken which is a jwt with myCustomClaims
 // Could call this GenerateIDTokenString, but the signature makes this fairly clear
-func generateIDToken(user *model.User, key *rsa.PrivateKey, exp int64) (string, error) {
+func GenerateIDToken(user *model.User, key *rsa.PrivateKey, exp int64) (string, error) {
 	unixTime := time.Now().Unix()
 	tokenExp := unixTime + exp
 
-	claims := IDTokenCustomClaims{
+	claims := model.IDTokenCustomClaims{
 		User: user,
 		StandardClaims: jwt.StandardClaims{
 			IssuedAt:  unixTime,
@@ -41,25 +35,9 @@ func generateIDToken(user *model.User, key *rsa.PrivateKey, exp int64) (string, 
 	return ss, nil
 }
 
-// RefreshToken holds the actual signed jwt string along with the ID
-// We return the id so it can be used without re-parsing the JWT from signed string
-type RefreshToken struct {
-	SignedTokenString string
-	ID                string
-	ExpiresIn   	  time.Duration
-}
-
-// RefreshTokenCustomClaims holds the payload of a refresh token
-// This can be used to extract user id for subsequent
-// application operations (IE, fetch user in Redis)
-type RefreshTokenCustomClaims struct {
-	UID uuid.UUID `json:"uid"`
-	jwt.StandardClaims
-}
-
-// generateRefreshToken creates a refresh token
+// GenerateRefreshToken creates a refresh token
 // The refresh token stores only the user's ID, a string
-func generateRefreshToken(uid uuid.UUID, key string, exp int64) (*RefreshToken, error) {
+func GenerateRefreshToken(uid uuid.UUID, key string, exp int64) (*model.RefreshToken, error) {
 	currentTime := time.Now()
 	tokenExp := currentTime.Add(time.Duration(exp) * time.Second)
 	tokenID, err := uuid.NewRandom()         // v4 uuid in the google uuid lib
@@ -69,7 +47,7 @@ func generateRefreshToken(uid uuid.UUID, key string, exp int64) (*RefreshToken, 
 		return nil, err
 	}
 
-	claims := RefreshTokenCustomClaims{
+	claims := model.RefreshTokenCustomClaims{
 		UID: uid,
 		StandardClaims: jwt.StandardClaims{
 			IssuedAt:  currentTime.Unix(),
@@ -86,7 +64,7 @@ func generateRefreshToken(uid uuid.UUID, key string, exp int64) (*RefreshToken, 
 		return nil, err
 	}
 
-	return &RefreshToken{
+	return &model.RefreshToken{
 		SignedTokenString: signedToken,
 		ID:                tokenID.String(),
 		ExpiresIn:         tokenExp.Sub(currentTime),

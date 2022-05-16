@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/dolong2110/Memoirization-Apps/account/model"
 	"github.com/dolong2110/Memoirization-Apps/account/model/apperrors"
+	"github.com/dolong2110/Memoirization-Apps/account/utils"
 	"github.com/google/uuid"
 	"log"
 )
@@ -35,10 +36,10 @@ func (s *userService) Get(ctx context.Context, uid uuid.UUID) (*model.User, erro
 	return u, err
 }
 
-// Signup reaches our to a UserRepository to sign up the user.
+// Signup reaches out to a UserRepository to sign up the user.
 // UserRepository Create should handle checking for user exists conflicts
 func (s *userService) Signup(ctx context.Context, user *model.User) error {
-	pwd, err := hashPassword(user.Password)
+	pwd, err := utils.HashPassword(user.Password)
 
 	if err != nil {
 		log.Printf("Unable to signup user for email: %v\n", user.Email)

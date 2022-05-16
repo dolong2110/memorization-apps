@@ -30,7 +30,7 @@ func TestSignup(t *testing.T) {
 		router := gin.Default()
 
 		NewHandler(&Config{
-			R:           router,
+			Engine:      router,
 			UserService: mockUserService,
 		})
 
@@ -63,7 +63,7 @@ func TestSignup(t *testing.T) {
 		router := gin.Default()
 
 		NewHandler(&Config{
-			R:           router,
+			Engine:      router,
 			UserService: mockUserService,
 		})
 
@@ -97,7 +97,7 @@ func TestSignup(t *testing.T) {
 		router := gin.Default()
 
 		NewHandler(&Config{
-			R:           router,
+			Engine:      router,
 			UserService: mockUserService,
 		})
 
@@ -131,7 +131,7 @@ func TestSignup(t *testing.T) {
 		router := gin.Default()
 
 		NewHandler(&Config{
-			R:           router,
+			Engine:      router,
 			UserService: mockUserService,
 		})
 
@@ -169,7 +169,7 @@ func TestSignup(t *testing.T) {
 		router := gin.Default()
 
 		NewHandler(&Config{
-			R:           router,
+			Engine:      router,
 			UserService: mockUserService,
 		})
 
@@ -219,7 +219,7 @@ func TestSignup(t *testing.T) {
 		router := gin.Default()
 
 		NewHandler(&Config{
-			R:            router,
+			Engine:       router,
 			UserService:  mockUserService,
 			TokenService: mockTokenService,
 		})
@@ -275,7 +275,7 @@ func TestSignup(t *testing.T) {
 		router := gin.Default()
 
 		NewHandler(&Config{
-			R:            router,
+			Engine:       router,
 			UserService:  mockUserService,
 			TokenService: mockTokenService,
 		})

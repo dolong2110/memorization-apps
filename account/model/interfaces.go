@@ -3,6 +3,7 @@ package model
 import (
 	"context"
 	"github.com/google/uuid"
+	"time"
 )
 
 // UserService defines methods the handler layer expects
@@ -23,4 +24,11 @@ type TokenService interface {
 type UserRepository interface {
 	FindByID(ctx context.Context, uid uuid.UUID) (*User, error)
 	Create(ctx context.Context, user *User) error
+}
+
+// TokenRepository defines methods it expects a repository
+// it interacts with to implement
+type TokenRepository interface {
+	SetRefreshToken(ctx context.Context, userID string, tokenID string, expiresIn time.Duration) error
+	DeleteRefreshToken(ctx context.Context, userID string, prevTokenID string) error
 }
