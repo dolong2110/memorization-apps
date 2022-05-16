@@ -1,4 +1,4 @@
 .idea
-.env.dev
+account/.env.dev
 *.pem
 .vscode

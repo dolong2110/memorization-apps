@@ -15,17 +15,6 @@ All of these layers can "work with" and pass models, defined in the model layer,
 
 This architecture lends itself well to unit testing, though this is by no means the only such architecture. Each layer can define an expectation of what each layer to its right must "implement." Any actual, or "concrete implementation," of a layer must conform to these expectations. We define these expectations in Go, and many other languages, by defining interfaces. We can then test the application layers separately by "mocking" the responses from these interfaces.
 
-## Using Docker
-
-each time change the code we should re-initialize the docker again at the root.
-
-````
-cd ..
-docker-compose up
-````
-
-## Running
-
 ````
 cd account
 go run main.go
@@ -38,3 +27,5 @@ The app's authorization details is below
 
 ![Aauthorization overview](authorization.png)
 
+## Client tool to see the table
+In here I choose to use pgadmin4

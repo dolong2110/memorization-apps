@@ -24,7 +24,7 @@ services:
         # So that Traefik can listen to the Docker events
             - /var/run/docker.sock:/var/run/docker.sock
     # set up postgres db in the container
-    postgres-auth:
+    postgres-account:
         image: "postgres:alpine"
         environment:
             - POSTGRES_PASSWORD=password
@@ -33,8 +33,8 @@ services:
         #   Set a volume for data and initial sql script
         #   May configure initial db for future demo
         volumes:
-            # here uses volume pgdata_auth -> need create volume key at bottom of this file to be able to use this
-            - "pgdata_auth:/var/lib/postgresql/data"
+            # here uses volume pgdata_account -> need create volume key at bottom of this file to be able to use this
+            - "pgdata_account:/var/lib/postgresql/data"
             # - ./init:/docker-entrypoint-initdb.d/
         command: [ "postgres", "-c", "log_statement=all" ]
     # it hosts docker container made in account/Dockerfile
@@ -46,7 +46,7 @@ services:
         # give image name
         image: account
         # add env file to container
-        env_file: .env.dev
+        env_file: ./account/.env.dev
         expose:
             - "8080"
         # labels tells traffic to look for this container
@@ -61,8 +61,8 @@ services:
             - ./account:/go/src/app
         # the account container must depend on the postgres container
         depends_on:
-            -   postgres-auth
+            - postgres-account
         # have to use $$ (double-dollar) so docker doesn't try to substitute a variable
         command: reflex -r "\.go$$" -s -- sh -c "go run ./"
 volumes:
-    pgdata_auth:
+    pgdata_account:
