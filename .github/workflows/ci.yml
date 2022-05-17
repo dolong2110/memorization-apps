@@ -9,10 +9,8 @@ on:
 jobs:
   build:
     name: golang_lint_and_test
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     strategy:
-      matrix:
-        os: [ ubuntu-lates ]
       fail-fast: false
     steps:
       - name: check out code
