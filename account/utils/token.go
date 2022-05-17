@@ -25,6 +25,7 @@ func GenerateIDToken(user *model.User, key *rsa.PrivateKey, exp int64) (string, 
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
+	log.Printf("HI")
 	ss, err := token.SignedString(key)
 
 	if err != nil {

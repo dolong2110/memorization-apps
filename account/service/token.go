@@ -47,6 +47,7 @@ func NewTokenService(c *TokenServiceConfig) model.TokenService {
 
 func (s *tokenService) NewPairFromUser(ctx context.Context, user *model.User, prevTokenID string) (*model.Token, error) {
 	// No need to use a repository for idToken as it is unrelated to any data source
+	log.Printf("HELLO")
 	idToken, err := utils.GenerateIDToken(user, s.PrivateKey, s.IDExpirationSecs)
 	if err != nil {
 		log.Printf("Error generating idToken for uid: %v. Error: %v\n", user.UID, err.Error())
