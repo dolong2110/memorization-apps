@@ -12,7 +12,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-latest, macos-latest ]
+        os: [ ubuntu-lates ]
       fail-fast: false
     steps:
       - name: check out code
@@ -42,12 +42,6 @@ jobs:
         with:
           path: ${{ steps.go-cache-paths.outputs.go-mod }}
           key: ${{ runner.os }}-go-mod-${{ hashFiles('**/go.sum') }}
-      - name: Run CI (OSX)
-        if: matrix.os == 'macos-latest'
-        run: make ci.macos
-      - name: Run CI (Ubuntu)
-        if: matrix.os == 'ubuntu-latest'
-        run: make ci.ubuntu
       - name: Run Golang CI Lint
         uses: golangci/golangci-lint-action@v2
         with:
