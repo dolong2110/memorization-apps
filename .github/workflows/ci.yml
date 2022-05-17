@@ -2,13 +2,15 @@ name: Continous Integration
 
 on:
   push:
-  pull_request:
     branches: [ master ]
+  pull_request:
 
 jobs:
   build:
     name: golang_lint_and_test
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
     steps:
       - name: check out code
         uses: actions/checkout@v2
