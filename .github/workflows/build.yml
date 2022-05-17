@@ -40,7 +40,7 @@ jobs:
       - uses: codespell-project/actions-codespell@master
         with:
           ignore_words_list: "anw"
-          skip: "go.mod,go.sum"
+          skip: "go.mod,go.sum,Makefile,docker-compose.yml"
 
   push_to_docker_latest:
     name: push master code to docker latest image
