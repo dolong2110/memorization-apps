@@ -22,14 +22,14 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: ^1.18
-      - name: Run Golang CI Lint
-        uses: golangci/golangci-lint-action@v2
-        with:
-          version: latest
-          args: -E gofmt
+#      - name: Run Golang CI Lint
+#        uses: golangci/golangci-lint-action@v2
+#        with:
+#          version: latest
+#          args: -E gofmt
       - name: run Unit tests.
         working-directory: ./account
-        run: go test -v -cover ./handler/... ./service/...
+        run: go test -v -cover ./...
   codespell:
     name: Check for spelling errors
     runs-on: ubuntu-latest
