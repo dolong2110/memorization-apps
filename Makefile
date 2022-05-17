@@ -1,4 +1,4 @@
-.PHONY: migrate-create migrate-up migrate-down migrate-force create-keypair check build init
+.PHONY: migrate-create migrate-up migrate-down migrate-force create-keypair init
 
 PWD = $(shell pwd)
 ACCTPATH = $(PWD)/account
@@ -27,13 +27,6 @@ create-keypair:
 	@echo "Creating an rsa 256 key pair"
 	openssl genpkey -algorithm RSA -out $(ACCTPATH)/rsa_private_$(ENV).pem -pkeyopt rsa_keygen_bits:2048
 	openssl rsa -in $(ACCTPATH)/rsa_private_$(ENV).pem -pubout -out $(ACCTPATH)/rsa_public_$(ENV).pem
-
-check:
-	@./hack/check.sh ${scope}
-
-build: check
-	$(GO) build -ldflags '$(LDFLAGS)'
-
 
 # create dev and test keys
 # run postgres containers in docker-compose
