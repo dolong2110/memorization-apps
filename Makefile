@@ -28,6 +28,14 @@ create-keypair:
 	openssl genpkey -algorithm RSA -out $(ACCTPATH)/rsa_private_$(ENV).pem -pkeyopt rsa_keygen_bits:2048
 	openssl rsa -in $(ACCTPATH)/rsa_private_$(ENV).pem -pubout -out $(ACCTPATH)/rsa_public_$(ENV).pem
 
+.PHONY: check
+check:
+	@./hack/check.sh ${scope}
+
+.PHONY: build
+build: check
+	$(GO) build -ldflags '$(LDFLAGS)'
+
 
 # create dev and test keys
 # run postgres containers in docker-compose
