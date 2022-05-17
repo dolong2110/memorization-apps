@@ -28,7 +28,8 @@ jobs:
           version: latest
           args: -E gofmt
       - name: run Unit tests.
-        run: |
+        run:
+          cd ./account
           go test ./...
   codespell:
     name: Check for spelling errors
