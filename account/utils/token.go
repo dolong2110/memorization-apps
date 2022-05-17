@@ -1,9 +1,11 @@
 package utils
 
 import (
+	"crypto/rand"
 	"crypto/rsa"
 	"github.com/dolong2110/Memoirization-Apps/account/model"
 	"github.com/google/uuid"
+	"golang.org/x/crypto/ssh"
 	"log"
 	"time"
 
@@ -42,7 +44,6 @@ func GenerateRefreshToken(uid uuid.UUID, key string, exp int64) (*model.RefreshT
 	currentTime := time.Now()
 	tokenExp := currentTime.Add(time.Duration(exp) * time.Second)
 	tokenID, err := uuid.NewRandom()         // v4 uuid in the google uuid lib
-
 	if err != nil {
 		log.Println("Failed to generate refresh token ID")
 		return nil, err
@@ -70,4 +71,36 @@ func GenerateRefreshToken(uid uuid.UUID, key string, exp int64) (*model.RefreshT
 		ID:                tokenID.String(),
 		ExpiresIn:         tokenExp.Sub(currentTime),
 	}, nil
+}
+
+// GeneratePrivateKey creates a RSA Private Key of specified byte size
+func GeneratePrivateKey(bitSize int) (*rsa.PrivateKey, error) {
+	// Private Key generation
+	privateKey, err := rsa.GenerateKey(rand.Reader, bitSize)
+	if err != nil {
+		return nil, err
+	}
+
+	// Validate Private Key
+	err = privateKey.Validate()
+	if err != nil {
+		return nil, err
+	}
+
+	log.Println("Private Key generated")
+	return privateKey, nil
+}
+
+// GeneratePublicKey take a rsa.PublicKey and return bytes suitable for writing to .pub file
+// returns in the format "ssh-rsa ..."
+func GeneratePublicKey(rsaPublicKey *rsa.PublicKey) ([]byte, error) {
+	publicRsaKey, err := ssh.NewPublicKey(rsaPublicKey)
+	if err != nil {
+		return nil, err
+	}
+
+	pubKeyBytes := ssh.MarshalAuthorizedKey(publicRsaKey)
+
+	log.Println("Public key generated")
+	return pubKeyBytes, nil
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/dolong2110/Memoirization-Apps/account/model"
 	"github.com/dolong2110/Memoirization-Apps/account/model/mocks"
+	"github.com/dolong2110/Memoirization-Apps/account/utils"
 	"github.com/stretchr/testify/mock"
 	"io/ioutil"
 	"testing"
@@ -20,9 +21,15 @@ func TestNewPairFromUser(t *testing.T) {
 	var idExp int64 = 15 * 60
 	var refreshExp int64 = 3 * 24 * 2600
 	privateKeyByte, _ := ioutil.ReadFile("../rsa_private_test.pem")
-	privateKey, _ := jwt.ParseRSAPrivateKeyFromPEM(privateKeyByte)
+	privateKey, err := jwt.ParseRSAPrivateKeyFromPEM(privateKeyByte)
+	if err != nil {
+		privateKey, _ = utils.GeneratePrivateKey(2048)
+	}
 	publicKeyByte, _ := ioutil.ReadFile("../rsa_public_test.pem")
-	publicKey, _ := jwt.ParseRSAPublicKeyFromPEM(publicKeyByte)
+	publicKey, err := jwt.ParseRSAPublicKeyFromPEM(publicKeyByte)
+	if err != nil {
+		publicKey = &privateKey.PublicKey
+	}
 	secret := "anotsorandomtestsecret"
 
 	mockTokenRepository := new(mocks.MockTokenRepository)

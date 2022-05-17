@@ -50,13 +50,11 @@ func inject(d *dataSources) (*gin.Engine, error) {
 
 	pubKeyFile := os.Getenv("PUBLIC_KEY_FILE")
 	pub, err := ioutil.ReadFile(pubKeyFile)
-
 	if err != nil {
 		return nil, fmt.Errorf("could not read public key pem file: %w", err)
 	}
 
 	pubKey, err := jwt.ParseRSAPublicKeyFromPEM(pub)
-
 	if err != nil {
 		return nil, fmt.Errorf("could not parse public key: %w", err)
 	}
