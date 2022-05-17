@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/dolong2110/Memoirization-Apps/account/model"
 	"github.com/dolong2110/Memoirization-Apps/account/model/apperrors"
-	"github.com/dolong2110/Memoirization-Apps/account/service/utils"
+	"github.com/dolong2110/Memoirization-Apps/account/utils"
 	"github.com/google/uuid"
 	"log"
 )
