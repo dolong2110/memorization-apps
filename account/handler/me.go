@@ -32,8 +32,7 @@ func (h *Handler) Me(c *gin.Context) {
 
 	// use the Request Context
 	ctx := c.Request.Context()
-	u, err := h.UserService.Get(ctx, uid)
-
+	user, err := h.UserService.Get(ctx, uid)
 	if err != nil {
 		log.Printf("Unable to find user: %v\n%v", uid, err)
 		e := apperrors.NewNotFound("user", uid.String())
@@ -45,6 +44,6 @@ func (h *Handler) Me(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"user": u,
+		"user": user,
 	})
 }

@@ -18,12 +18,14 @@ type UserService interface {
 // with in regards to producing JWTs as string
 type TokenService interface {
 	NewPairFromUser(ctx context.Context, user *User, prevTokenID string) (*Token, error)
+	ValidateIDToken(tokenString string) (*User, error) // jwt not require context, and we not do anything in repository or db that cancel or modify context
 }
 
 // UserRepository defines methods the service layer expects
 // any repository it interacts with to implement
 type UserRepository interface {
 	FindByID(ctx context.Context, uid uuid.UUID) (*User, error)
+	FindByEmail(ctx context.Context, email string) (*User, error)
 	Create(ctx context.Context, user *User) error
 }
 

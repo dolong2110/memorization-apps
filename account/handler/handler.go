@@ -39,9 +39,11 @@ func NewHandler(c *Config) {
 	g := c.Engine.Group(c.BaseURL) // Create a handler (which will later have injected services)
 	if gin.Mode() != gin.TestMode {
 		g.Use(middleware.Timeout(c.TimeoutDuration, apperrors.NewServiceUnavailable()))
+		g.GET("/me", middleware.AuthUser(h.TokenService), h.Me)
+	} else {
+		g.GET("/me", h.Me)
 	}
 
-	g.GET("/me", h.Me)
 	g.POST("/signup", h.Signup)
 	g.POST("/signin", h.Signin)
 	g.POST("/signout", h.Signout)

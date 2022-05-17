@@ -3,6 +3,7 @@ package utils
 import (
 	"crypto/rand"
 	"crypto/rsa"
+	"fmt"
 	"github.com/dolong2110/Memoirization-Apps/account/model"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/ssh"
@@ -69,6 +70,31 @@ func GenerateRefreshToken(uid uuid.UUID, key string, exp int64) (*model.RefreshT
 		ID:                tokenID.String(),
 		ExpiresIn:         tokenExp.Sub(currentTime),
 	}, nil
+}
+
+// ValidateIDToken returns the token's claims if the token is valid
+func ValidateIDToken(tokenString string, key *rsa.PublicKey) (*model.IDTokenCustomClaims, error) {
+	claims := &model.IDTokenCustomClaims{}
+
+	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+		return key, nil
+	})
+
+	// For now we'll just return the error and handle logging in service level
+	if err != nil {
+		return nil, err
+	}
+
+	if !token.Valid {
+		return nil, fmt.Errorf("ID token is invalid")
+	}
+
+	claims, ok := token.Claims.(*model.IDTokenCustomClaims)
+	if !ok {
+		return nil, fmt.Errorf("ID token valid but couldn't parse claims")
+	}
+
+	return claims, nil
 }
 
 // GeneratePrivateKey creates a RSA Private Key of specified byte size

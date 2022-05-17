@@ -31,9 +31,9 @@ func NewUserService(c *USConfig) model.UserService {
 
 // Get retrieves a user based on their uuid
 func (s *userService) Get(ctx context.Context, uid uuid.UUID) (*model.User, error) {
-	u, err := s.UserRepository.FindByID(ctx, uid)
+	user, err := s.UserRepository.FindByID(ctx, uid)
 
-	return u, err
+	return user, err
 }
 
 // Signup reaches out to a UserRepository to sign up the user.
@@ -59,9 +59,25 @@ func (s *userService) Signup(ctx context.Context, user *model.User) error {
 }
 
 // Signin reaches our to a UserRepository check if the user exists
-// and then compares the supplied password with the provided password
-// if a valid email/password combo is provided, u will hold all
+// and then compares the supplied password with the provided password.
+// If a valid email/password combo is provided, u will hold all
 // available user fields
-func (s *userService) Signin(ctx context.Context, u *model.User) error {
-	panic("Not implemented")
+func (s *userService) Signin(ctx context.Context, user *model.User) error {
+	uFetched, err := s.UserRepository.FindByEmail(ctx, user.Email)
+	if err != nil {
+		return apperrors.NewAuthorization("Invalid email and password combination")
+	}
+
+	// verify password - we previously created this method
+	match, err := utils.ComparePasswords(uFetched.Password, user.Password)
+	if err != nil {
+		return apperrors.NewInternal()
+	}
+
+	if !match {
+		return apperrors.NewAuthorization("Invalid email and password combination")
+	}
+
+	*user = *uFetched
+	return nil
 }
