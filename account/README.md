@@ -4,7 +4,7 @@
 
 The architecture for the backend service is given below. This architecture is heavily influenced by [go_clean_arch](https://github.com/bxcodec/go-clean-arch)
 
-![App Overview](./service_architecture.png)
+![App Overview](../pictures/service_architecture.png)
 
 Incoming HTTP requests are parsed and validated by the handler layer. The handler layer calls the service layer's methods, which in turn accesses the repository, which uses data sources (persistence, data storage, etc.). Each layer depends on a "concrete implementation" of the layer to its right.
 
@@ -23,12 +23,12 @@ go test -v ./service -run NewPairFromUser # test exact method to reduce tests
 ````
 
 # Application Layers
-![Application layers](./application_layers.png)
+![Application layers](../pictures/application_layers.png)
 
 ## Authorization
 The app's authorization details is below
 
-![Authorization overview](authorization.png)
+![Authorization overview](../pictures/authorization.png)
 
 
 ## Friendly UI client tool to watch the table
