@@ -39,7 +39,7 @@ func GenerateIDToken(user *model.User, key *rsa.PrivateKey, exp int64) (string, 
 
 // GenerateRefreshToken creates a refresh token
 // The refresh token stores only the user's ID, a string
-func GenerateRefreshToken(uid uuid.UUID, key string, exp int64) (*model.RefreshToken, error) {
+func GenerateRefreshToken(uid uuid.UUID, key string, exp int64) (*model.RefreshTokenData, error) {
 	currentTime := time.Now()
 	tokenExp := currentTime.Add(time.Duration(exp) * time.Second)
 	tokenID, err := uuid.NewRandom()         // v4 uuid in the google uuid lib
@@ -65,9 +65,9 @@ func GenerateRefreshToken(uid uuid.UUID, key string, exp int64) (*model.RefreshT
 		return nil, err
 	}
 
-	return &model.RefreshToken{
+	return &model.RefreshTokenData{
 		SignedTokenString: signedToken,
-		ID:                tokenID.String(),
+		ID:                tokenID,
 		ExpiresIn:         tokenExp.Sub(currentTime),
 	}, nil
 }

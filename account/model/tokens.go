@@ -8,8 +8,22 @@ import (
 
 // Token used for returning pairs of id and refresh tokens
 type Token struct {
-	IDToken      string `json:"idToken"`
-	RefreshToken string `json:"refreshToken"`
+	IDToken
+	RefreshToken
+}
+
+// RefreshToken stores token properties that
+// are accessed in multiple application layers
+type RefreshToken struct {
+	ID                uuid.UUID `json:"-"`
+	UID               uuid.UUID `json:"-"`
+	SignedStringToken string    `json:"refreshToken"`
+}
+
+// IDToken stores token properties that
+// are accessed in multiple application layers
+type IDToken struct {
+	SignedStringToken string `json:"idToken"`
 }
 
 // IDTokenCustomClaims holds structure of jwt claims of idToken
@@ -18,12 +32,12 @@ type IDTokenCustomClaims struct {
 	jwt.StandardClaims
 }
 
-// RefreshToken holds the actual signed jwt string along with the ID
+// RefreshTokenData holds the actual signed jwt string along with the ID
 // We return the id, so it can be used without re-parsing the JWT from signed string
-type RefreshToken struct {
+type RefreshTokenData struct {
 	SignedTokenString string
-	ID                string
-	ExpiresIn   	  time.Duration
+	ID                uuid.UUID
+	ExpiresIn         time.Duration
 }
 
 // RefreshTokenCustomClaims holds the payload of a refresh token

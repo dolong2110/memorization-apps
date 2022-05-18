@@ -14,8 +14,8 @@ type MockUserRepository struct {
 }
 
 // Create is a mock for UserRepository Create
-func (m *MockUserRepository) Create(ctx context.Context, u *model.User) error {
-	ret := m.Called(ctx, u)
+func (m *MockUserRepository) Create(ctx context.Context, user *model.User) error {
+	ret := m.Called(ctx, user)
 
 	var r0 error
 	if ret.Get(0) != nil {

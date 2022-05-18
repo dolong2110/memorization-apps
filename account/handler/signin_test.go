@@ -103,8 +103,8 @@ func TestSignin(t *testing.T) {
 		}
 
 		mockTokenPair := &model.Token{
-			IDToken:      "idToken",
-			RefreshToken: "refreshToken",
+			IDToken:      model.IDToken{SignedStringToken: "idToken"},
+			RefreshToken: model.RefreshToken{SignedStringToken: "refreshToken"},
 		}
 
 		mockTokenService.On("NewPairFromUser", mockTSArgs...).Return(mockTokenPair, nil)
