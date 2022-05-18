@@ -18,6 +18,7 @@ type UserService interface {
 // with in regards to producing JWTs as string
 type TokenService interface {
 	NewPairFromUser(ctx context.Context, user *User, prevRefreshTokenID string) (*Token, error)
+	Signout(ctx context.Context, uid uuid.UUID) error
 	ValidateIDToken(idTokenString string) (*User, error) // jwt not require context, and we not do anything in repository or db that cancel or modify context
 	ValidateRefreshToken(refreshTokenString string) (*RefreshToken, error) // not need context because not reach DB or other layer.
 }
@@ -35,4 +36,5 @@ type UserRepository interface {
 type TokenRepository interface {
 	SetRefreshToken(ctx context.Context, userID string, tokenID string, expiresIn time.Duration) error
 	DeleteRefreshToken(ctx context.Context, userID string, prevTokenID string) error
+	DeleteUserRefreshToken(ctx context.Context, userId string) error
 }
