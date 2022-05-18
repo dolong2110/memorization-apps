@@ -35,7 +35,7 @@ type IDTokenCustomClaims struct {
 // RefreshTokenData holds the actual signed jwt string along with the ID
 // We return the id, so it can be used without re-parsing the JWT from signed string
 type RefreshTokenData struct {
-	SignedTokenString string
+	SignedStringToken string
 	ID                uuid.UUID
 	ExpiresIn         time.Duration
 }

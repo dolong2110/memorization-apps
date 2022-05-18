@@ -79,7 +79,7 @@ func (s *tokenService) NewPairFromUser(ctx context.Context, user *model.User, pr
 
 	return &model.Token{
 		IDToken:      model.IDToken{SignedStringToken: idToken},
-		RefreshToken: model.RefreshToken{SignedStringToken: refreshToken.SignedTokenString, ID: refreshToken.ID, UID: user.UID},
+		RefreshToken: model.RefreshToken{SignedStringToken: refreshToken.SignedStringToken, ID: refreshToken.ID, UID: user.UID},
 	}, nil
 }
 

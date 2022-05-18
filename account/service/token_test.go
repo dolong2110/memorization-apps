@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/dolong2110/Memoirization-Apps/account/model"
+	"github.com/dolong2110/Memoirization-Apps/account/model/apperrors"
 	"github.com/dolong2110/Memoirization-Apps/account/model/mocks"
 	"github.com/dolong2110/Memoirization-Apps/account/utils"
 	"github.com/stretchr/testify/mock"
@@ -20,13 +21,13 @@ import (
 func TestNewPairFromUser(t *testing.T) {
 	var idExp int64 = 15 * 60
 	var refreshExp int64 = 3 * 24 * 2600
-	privateKeyByte, _ := ioutil.ReadFile("../rsa_private_test.pem")
-	privateKey, err := jwt.ParseRSAPrivateKeyFromPEM(privateKeyByte)
+	privateKeyFromPem, _ := ioutil.ReadFile("../rsa_private_test.pem")
+	privateKey, err := jwt.ParseRSAPrivateKeyFromPEM(privateKeyFromPem)
 	if err != nil {
 		privateKey, _ = utils.GeneratePrivateKey(2048)
 	}
-	publicKeyByte, _ := ioutil.ReadFile("../rsa_public_test.pem")
-	publicKey, err := jwt.ParseRSAPublicKeyFromPEM(publicKeyByte)
+	publicKeyFromPem, _ := ioutil.ReadFile("../rsa_public_test.pem")
+	publicKey, err := jwt.ParseRSAPublicKeyFromPEM(publicKeyFromPem)
 	if err != nil {
 		publicKey = &privateKey.PublicKey
 	}
@@ -167,5 +168,176 @@ func TestNewPairFromUser(t *testing.T) {
 		mockTokenRepository.AssertCalled(t, "SetRefreshToken", setSuccessArguments...)
 		// DeleteRefreshToken should not be called since prevID is ""
 		mockTokenRepository.AssertNotCalled(t, "DeleteRefreshToken")
+	})
+	t.Run("Prev token not in repository", func(t *testing.T) {
+		ctx := context.Background()
+		uid, _ := uuid.NewRandom()
+		user := &model.User{
+			UID: uid,
+		}
+
+		tokenIDNotInRepo := "not_in_token_repo"
+
+		deleteArgs := mock.Arguments{
+			ctx,
+			user.UID.String(),
+			tokenIDNotInRepo,
+		}
+
+		mockError := apperrors.NewAuthorization("Invalid refresh token")
+		mockTokenRepository.
+			On("DeleteRefreshToken", deleteArgs...).
+			Return(mockError)
+
+		_, err := tokenService.NewPairFromUser(ctx, user, tokenIDNotInRepo)
+		assert.Error(t, err)
+
+		appError, ok := err.(*apperrors.Error)
+
+		assert.True(t, ok)
+		assert.Equal(t, apperrors.Authorization, appError.Type)
+		mockTokenRepository.AssertCalled(t, "DeleteRefreshToken", deleteArgs...)
+		mockTokenRepository.AssertNotCalled(t, "SetRefreshToken")
+	})
+}
+
+func TestSignout(t *testing.T) {
+	mockTokenRepository := new(mocks.MockTokenRepository)
+	tokenService := NewTokenService(&TokenServiceConfig{
+		TokenRepository: mockTokenRepository,
+	})
+
+	t.Run("No error", func(t *testing.T) {
+		uidSuccess, _ := uuid.NewRandom()
+		mockTokenRepository.
+			On("DeleteUserRefreshToken", mock.AnythingOfType("*context.emptyCtx"), uidSuccess.String()).
+			Return(nil)
+
+		ctx := context.Background()
+		err := tokenService.Signout(ctx, uidSuccess)
+		assert.NoError(t, err)
+	})
+
+	t.Run("Error", func(t *testing.T) {
+		uidError, _ := uuid.NewRandom()
+		mockTokenRepository.
+			On("DeleteUserRefreshToken", mock.AnythingOfType("*context.emptyCtx"), uidError.String()).
+			Return(apperrors.NewInternal())
+
+		ctx := context.Background()
+		err := tokenService.Signout(ctx, uidError)
+
+		assert.Error(t, err)
+
+		apperr, ok := err.(*apperrors.Error)
+		assert.True(t, ok)
+		assert.Equal(t, apperr.Type, apperrors.Internal)
+	})
+}
+
+func TestValidateIDToken(t *testing.T) {
+	var idExp int64 = 15 * 60
+
+	privateKeyFromPem, _ := ioutil.ReadFile("../rsa_private_test.pem")
+	privateKey, err := jwt.ParseRSAPrivateKeyFromPEM(privateKeyFromPem)
+	if err != nil {
+		privateKey, _ = utils.GeneratePrivateKey(2048)
+	}
+	publicKeyFromPem, _ := ioutil.ReadFile("../rsa_public_test.pem")
+	publicKey, err := jwt.ParseRSAPublicKeyFromPEM(publicKeyFromPem)
+	if err != nil {
+		publicKey = &privateKey.PublicKey
+	}
+
+	// instantiate a common token service to be used by all tests
+	tokenService := NewTokenService(&TokenServiceConfig{
+		PrivateKey:       privateKey,
+		PublicKey:        publicKey,
+		IDExpirationSecs: idExp,
+	})
+
+	// include password to make sure it is not serialized
+	// since json tag is "-"
+	uid, _ := uuid.NewRandom()
+	u := &model.User{
+		UID:      uid,
+		Email:    "bob@bob.com",
+		Password: "blarghedymcblarghface",
+	}
+
+	t.Run("Valid token", func(t *testing.T) {
+		// maybe not the best approach to depend on utility method
+		// token will be valid for 15 minutes
+		ss, _ := utils.GenerateIDToken(u, privateKey, idExp)
+
+		uFromToken, err := tokenService.ValidateIDToken(ss)
+		assert.NoError(t, err)
+
+		assert.ElementsMatch(
+			t,
+			[]interface{}{u.Email, u.Name, u.UID, u.Website, u.ImageURL},
+			[]interface{}{uFromToken.Email, uFromToken.Name, uFromToken.UID, uFromToken.Website, uFromToken.ImageURL},
+		)
+	})
+
+	t.Run("Expired token", func(t *testing.T) {
+		// maybe not the best approach to depend on utility method
+		// token will be valid for 15 minutes
+		ss, _ := utils.GenerateIDToken(u, privateKey, -1) // expires one second ago
+
+		expectedErr := apperrors.NewAuthorization("Unable to verify user from idToken")
+
+		_, err := tokenService.ValidateIDToken(ss)
+		assert.EqualError(t, err, expectedErr.Message)
+	})
+
+	t.Run("Invalid signature", func(t *testing.T) {
+		// maybe not the best approach to depend on utility method
+		// token will be valid for 15 minutes
+		ss, _ := utils.GenerateIDToken(u, privateKey, -1) // expires one second ago
+
+		expectedErr := apperrors.NewAuthorization("Unable to verify user from idToken")
+
+		_, err := tokenService.ValidateIDToken(ss)
+		assert.EqualError(t, err, expectedErr.Message)
+	})
+
+	// TODO - Add other invalid token types
+}
+
+func TestValidateRefreshToken(t *testing.T) {
+	var refreshExp int64 = 3 * 24 * 2600
+	secret := "anotsorandomtestsecret"
+
+	tokenService := NewTokenService(&TokenServiceConfig{
+		RefreshSecret:         secret,
+		RefreshExpirationSecs: refreshExp,
+	})
+
+	uid, _ := uuid.NewRandom()
+	user := &model.User{
+		UID:      uid,
+		Email:    "bob@bob.com",
+		Password: "blarghedymcblarghface",
+	}
+
+	t.Run("Valid token", func(t *testing.T) {
+		testRefreshToken, _ := utils.GenerateRefreshToken(user.UID, secret, refreshExp)
+
+		validatedRefreshToken, err := tokenService.ValidateRefreshToken(testRefreshToken.SignedStringToken)
+		assert.NoError(t, err)
+
+		assert.Equal(t, user.UID, validatedRefreshToken.UID)
+		assert.Equal(t, testRefreshToken.SignedStringToken, validatedRefreshToken.SignedStringToken)
+		assert.Equal(t, user.UID, validatedRefreshToken.UID)
+	})
+
+	t.Run("Expired token", func(t *testing.T) {
+		testRefreshToken, _ := utils.GenerateRefreshToken(user.UID, secret, -1)
+
+		expectedErr := apperrors.NewAuthorization("Unable to verify user from refresh token")
+
+		_, err := tokenService.ValidateRefreshToken(testRefreshToken.SignedStringToken)
+		assert.EqualError(t, err, expectedErr.Message)
 	})
 }

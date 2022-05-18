@@ -66,7 +66,7 @@ func GenerateRefreshToken(uid uuid.UUID, key string, exp int64) (*model.RefreshT
 	}
 
 	return &model.RefreshTokenData{
-		SignedTokenString: signedToken,
+		SignedStringToken: signedToken,
 		ID:                tokenID,
 		ExpiresIn:         tokenExp.Sub(currentTime),
 	}, nil
