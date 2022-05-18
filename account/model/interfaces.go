@@ -17,8 +17,9 @@ type UserService interface {
 // TokenService defines methods the handler layer expects to interact
 // with in regards to producing JWTs as string
 type TokenService interface {
-	NewPairFromUser(ctx context.Context, user *User, prevTokenID string) (*Token, error)
-	ValidateIDToken(tokenString string) (*User, error) // jwt not require context, and we not do anything in repository or db that cancel or modify context
+	NewPairFromUser(ctx context.Context, user *User, prevRefreshTokenID string) (*Token, error)
+	ValidateIDToken(idTokenString string) (*User, error) // jwt not require context, and we not do anything in repository or db that cancel or modify context
+	ValidateRefreshToken(refreshTokenString string) (*RefreshToken, error) // not need context because not reach DB or other layer.
 }
 
 // UserRepository defines methods the service layer expects

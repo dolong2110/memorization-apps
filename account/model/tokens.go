@@ -17,13 +17,13 @@ type Token struct {
 type RefreshToken struct {
 	ID                uuid.UUID `json:"-"`
 	UID               uuid.UUID `json:"-"`
-	SignedStringToken string    `json:"refreshToken"`
+	SignedStringToken string    `json:"refresh_token"`
 }
 
 // IDToken stores token properties that
 // are accessed in multiple application layers
 type IDToken struct {
-	SignedStringToken string `json:"idToken"`
+	SignedStringToken string `json:"id_token"`
 }
 
 // IDTokenCustomClaims holds structure of jwt claims of idToken
