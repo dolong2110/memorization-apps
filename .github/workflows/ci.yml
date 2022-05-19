@@ -51,7 +51,7 @@ jobs:
         working-directory: ./account
         run: |
           go vet .
-          golint -set_exit_status=1
+          golint -set_exit_status=1 .
 
   codespell:
     name: Check for spelling errors
