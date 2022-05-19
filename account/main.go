@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"syscall"
 	"time"
 )
 
@@ -42,7 +41,8 @@ func main() {
 	// Wait for kill signal of channel
 	quit := make(chan os.Signal)
 
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	var signalsToIgnore = []os.Signal{os.Interrupt}
+	signal.Notify(quit, signalsToIgnore...)
 
 	// This blocks until a signal is passed into the quit channel
 	<-quit
