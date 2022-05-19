@@ -4,11 +4,10 @@ on:
   push:
     branches: [ master ]
   pull_request:
-    branches: [ master ]
 
 jobs:
   build:
-    name: golang_lint_and_test
+    name: Continuos Integration
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -18,10 +17,16 @@ jobs:
         with:
           persist-credentials: false
       - name: setup Go
-        id: go
         uses: actions/setup-go@v2
+        id: go
         with:
           go-version: ^1.18
+      - name: Install dependencies
+        run: |
+          go version
+          go get -u golang.org/x/lint/golint
+      - name: Build
+        run: go build .
 #      - name: Run Golang CI Lint
 #        uses: golangci/golangci-lint-action@v2
 #        with:
@@ -30,6 +35,7 @@ jobs:
       - name: run Unit tests.
         working-directory: ./account
         run: go test -v -cover ./...
+
   codespell:
     name: Check for spelling errors
     runs-on: ubuntu-latest
