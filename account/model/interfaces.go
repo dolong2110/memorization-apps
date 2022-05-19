@@ -38,5 +38,5 @@ type UserRepository interface {
 type TokenRepository interface {
 	SetRefreshToken(ctx context.Context, userID string, tokenID string, expiresIn time.Duration) error
 	DeleteRefreshToken(ctx context.Context, userID string, prevTokenID string) error
-	DeleteUserRefreshToken(ctx context.Context, userId string) error
+	DeleteUserRefreshToken(ctx context.Context, userID string) error
 }

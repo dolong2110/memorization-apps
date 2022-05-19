@@ -9,6 +9,7 @@ import (
 	"golang.org/x/crypto/scrypt"
 )
 
+// HashPassword receive a string password and hash it with salt
 func HashPassword(password string) (string, error) {
 	// example for making salt - https://play.golang.org/p/_Aw6WeWC42I
 	salt := make([]byte, 32)
@@ -29,6 +30,8 @@ func HashPassword(password string) (string, error) {
 	return hashedPW, nil
 }
 
+// ComparePasswords get the string password and hashed it with salt
+// get from stored password and compare both hashed passwords
 func ComparePasswords(storedPassword string, suppliedPassword string) (bool, error) {
 	pwSalt := strings.Split(storedPassword, ".")
 

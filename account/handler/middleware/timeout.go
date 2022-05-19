@@ -43,7 +43,7 @@ func (tw *timeoutWriter) Write(b []byte) (int, error) {
 	return tw.writerBuffer.Write(b)
 }
 
-// In http.ResponseWriter interface
+//WriteHeader In http.ResponseWriter interface
 func (tw *timeoutWriter) WriteHeader(code int) {
 	checkWriteHeaderCode(code)
 	tw.mutex.Lock()
@@ -67,7 +67,7 @@ func (tw *timeoutWriter) Header() http.Header {
 	return tw.header
 }
 
-// SetTimeOut sets timedOut field to true
+//SetTimeOut sets timedOut field to true
 func (tw *timeoutWriter) SetTimedOut() {
 	tw.timedOut = true
 }
@@ -78,6 +78,7 @@ func checkWriteHeaderCode(code int) {
 	}
 }
 
+// Timeout middleware to set time out stop for api
 func Timeout(timeout time.Duration, errTimeout *apperrors.Error) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// set Gin's writer as our custom writer
