@@ -50,7 +50,7 @@ jobs:
       - name: Run Vet & Lint
         working-directory: ./account
         run: |
-          go vet .
+          go vet ./...
           golint -set_exit_status=1 ./...
 
   codespell:
