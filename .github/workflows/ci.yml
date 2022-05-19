@@ -22,10 +22,12 @@ jobs:
         with:
           go-version: ^1.18
       - name: Install dependencies
+        working-directory: ./account
         run: |
           go version
           go get -u golang.org/x/lint/golint
       - name: Build
+        working-directory: ./account
         run: go build .
 #      - name: Run Golang CI Lint
 #        uses: golangci/golangci-lint-action@v2
