@@ -81,3 +81,19 @@ func (s *userService) Signin(ctx context.Context, user *model.User) error {
 	*user = *uFetched
 	return nil
 }
+
+func (s *userService) UpdateDetails(ctx context.Context, user *model.User) error {
+	// Update user in UserRepository
+	err := s.UserRepository.Update(ctx, user)
+	if err != nil {
+		return err
+	}
+
+	// // Publish user updated
+	// err = s.EventsBroker.PublishUserUpdated(user, false)
+	// if err != nil {
+	// 	return apperrors.NewInternal()
+	// }
+
+	return nil
+}

@@ -68,3 +68,26 @@ func (r *pGUserRepository) FindByID(ctx context.Context, uid uuid.UUID) (*model.
 
 	return user, nil
 }
+
+// Update updates a user's properties
+func (r *pGUserRepository) Update(ctx context.Context, user *model.User) error {
+	query := `
+		UPDATE users 
+		SET name=:name, email=:email, website=:website
+		WHERE uid=:uid
+		RETURNING *;
+	`
+
+	nstmt, err := r.DB.PrepareNamedContext(ctx, query)
+	if err != nil {
+		log.Printf("Unable to prepare user update query: %v\n", err)
+		return apperrors.NewInternal()
+	}
+
+	if err := nstmt.GetContext(ctx, user, user); err != nil {
+		log.Printf("Failed to update details for user: %v\n", user)
+		return apperrors.NewInternal()
+	}
+
+	return nil
+}

@@ -6,6 +6,7 @@ import (
 	"github.com/dolong2110/Memoirization-Apps/account/model"
 	"github.com/dolong2110/Memoirization-Apps/account/model/apperrors"
 	"github.com/dolong2110/Memoirization-Apps/account/model/mocks"
+	"github.com/dolong2110/Memoirization-Apps/account/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
@@ -120,5 +121,142 @@ func TestSignup(t *testing.T) {
 		assert.EqualError(t, err, mockErr.Error())
 
 		mockUserRepository.AssertExpectations(t)
+	})
+}
+
+func TestSignin(t *testing.T) {
+	// setup valid email/pw combo with hashed password to test method
+	// response when provided password is invalid
+	email := "bob@bob.com"
+	validPW := "howdyhoneighbor!"
+	hashedValidPW, _ := utils.HashPassword(validPW)
+	invalidPW := "howdyhodufus!"
+
+	mockUserRepository := new(mocks.MockUserRepository)
+	us := NewUserService(&USConfig{
+		UserRepository: mockUserRepository,
+	})
+
+	t.Run("Success", func(t *testing.T) {
+		uid, _ := uuid.NewRandom()
+
+		mockUser := &model.User{
+			Email:    email,
+			Password: validPW,
+		}
+
+		mockUserResp := &model.User{
+			UID:      uid,
+			Email:    email,
+			Password: hashedValidPW,
+		}
+
+		mockArgs := mock.Arguments{
+			mock.AnythingOfType("*context.emptyCtx"),
+			email,
+		}
+
+		// We can use Run method to modify the user when the Create method is called.
+		//  We can then chain on a Return method to return no error
+		mockUserRepository.
+			On("FindByEmail", mockArgs...).Return(mockUserResp, nil)
+
+		ctx := context.TODO()
+		err := us.Signin(ctx, mockUser)
+
+		assert.NoError(t, err)
+		mockUserRepository.AssertCalled(t, "FindByEmail", mockArgs...)
+	})
+
+	t.Run("Invalid email/password combination", func(t *testing.T) {
+		uid, _ := uuid.NewRandom()
+
+		mockUser := &model.User{
+			Email:    email,
+			Password: invalidPW,
+		}
+
+		mockUserResp := &model.User{
+			UID:      uid,
+			Email:    email,
+			Password: hashedValidPW,
+		}
+
+		mockArgs := mock.Arguments{
+			mock.AnythingOfType("*context.emptyCtx"),
+			email,
+		}
+
+		// We can use Run method to modify the user when the Create method is called.
+		//  We can then chain on a Return method to return no error
+		mockUserRepository.
+			On("FindByEmail", mockArgs...).Return(mockUserResp, nil)
+
+		ctx := context.TODO()
+		err := us.Signin(ctx, mockUser)
+
+		assert.Error(t, err)
+		assert.EqualError(t, err, "Invalid email and password combination")
+		mockUserRepository.AssertCalled(t, "FindByEmail", mockArgs...)
+	})
+}
+
+func TestUpdateDetails(t *testing.T) {
+	mockUserRepository := new(mocks.MockUserRepository)
+	us := NewUserService(&USConfig{
+		UserRepository: mockUserRepository,
+	})
+
+	t.Run("Success", func(t *testing.T) {
+		uid, _ := uuid.NewRandom()
+
+		mockUser := &model.User{
+			UID:     uid,
+			Email:   "new@bob.com",
+			Website: "https://jacobgoodwin.me",
+			Name:    "A New Bob!",
+		}
+
+		mockArgs := mock.Arguments{
+			mock.AnythingOfType("*context.emptyCtx"),
+			mockUser,
+		}
+
+		mockUserRepository.
+			On("Update", mockArgs...).Return(nil)
+
+		ctx := context.TODO()
+		err := us.UpdateDetails(ctx, mockUser)
+
+		assert.NoError(t, err)
+		mockUserRepository.AssertCalled(t, "Update", mockArgs...)
+	})
+
+	t.Run("Failure", func(t *testing.T) {
+		uid, _ := uuid.NewRandom()
+
+		mockUser := &model.User{
+			UID: uid,
+		}
+
+		mockArgs := mock.Arguments{
+			mock.AnythingOfType("*context.emptyCtx"),
+			mockUser,
+		}
+
+		mockError := apperrors.NewInternal()
+
+		mockUserRepository.
+			On("Update", mockArgs...).Return(mockError)
+
+		ctx := context.TODO()
+		err := us.UpdateDetails(ctx, mockUser)
+		assert.Error(t, err)
+
+		apperror, ok := err.(*apperrors.Error)
+		assert.True(t, ok)
+		assert.Equal(t, apperrors.Internal, apperror.Type)
+
+		mockUserRepository.AssertCalled(t, "Update", mockArgs...)
 	})
 }
