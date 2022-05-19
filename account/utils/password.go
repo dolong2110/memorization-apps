@@ -34,12 +34,14 @@ func ComparePasswords(storedPassword string, suppliedPassword string) (bool, err
 
 	// check supplied password salted with hash
 	salt, err := hex.DecodeString(pwSalt[1])
-
 	if err != nil {
 		return false, fmt.Errorf("unable to verify user password")
 	}
 
 	sHash, err := scrypt.Key([]byte(suppliedPassword), salt, 32768, 8, 1, 32)
+	if err != nil {
+		return false, fmt.Errorf("unable to hash user password")
+	}
 
 	return hex.EncodeToString(sHash) == pwSalt[0], nil
 }
