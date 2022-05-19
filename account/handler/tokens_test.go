@@ -79,9 +79,55 @@ func TestTokens(t *testing.T) {
 		mockUserService.AssertNotCalled(t, "Get")
 		mockTokenService.AssertNotCalled(t, "NewPairFromUser")
 	})
+	t.Run("User not found", func(t *testing.T) {
+		validTokenString := "valid1"
+		mockTokenID, _ := uuid.NewRandom()
+		mockUserID, _ := uuid.NewRandom()
 
+		mockRefreshTokenResp := &model.RefreshToken{
+			SignedStringToken: validTokenString,
+			ID:                mockTokenID,
+			UID:               mockUserID,
+		}
+
+		mockTokenService.
+			On("ValidateRefreshToken", validTokenString).
+			Return(mockRefreshTokenResp, nil)
+
+		getArgs := mock.Arguments{
+			mock.AnythingOfType("*context.emptyCtx"),
+			mockRefreshTokenResp.UID,
+		}
+
+		mockError := apperrors.NewNotFound("user", mockUserID.String())
+		mockUserService.
+			On("Get", getArgs...).
+			Return(nil,  mockError)
+
+		// a response recorder for getting written http response
+		rr := httptest.NewRecorder()
+
+		// create a request body with invalid fields
+		reqBody, _ := json.Marshal(gin.H{
+			"refresh_token": validTokenString,
+		})
+
+		request, _ := http.NewRequest(http.MethodPost, "/tokens", bytes.NewBuffer(reqBody))
+		request.Header.Set("Content-Type", "application/json")
+		router.ServeHTTP(rr, request)
+
+		respBody, _ := json.Marshal(gin.H{
+			"error": mockError,
+		})
+
+		assert.Equal(t, mockError.Status(), rr.Code)
+		assert.Equal(t, respBody, rr.Body.Bytes())
+		mockTokenService.AssertCalled(t, "ValidateRefreshToken", validTokenString)
+		mockUserService.AssertCalled(t, "Get", getArgs...)
+		mockTokenService.AssertNotCalled(t, "NewPairFromUser")
+	})
 	t.Run("Failure to create new token pair", func(t *testing.T) {
-		validTokenString := "valid"
+		validTokenString := "valid2"
 		mockTokenID, _ := uuid.NewRandom()
 		mockUserID, _ := uuid.NewRandom()
 
@@ -140,9 +186,8 @@ func TestTokens(t *testing.T) {
 		mockUserService.AssertCalled(t, "Get", getArgs...)
 		mockTokenService.AssertCalled(t, "NewPairFromUser", newPairArgs...)
 	})
-
 	t.Run("Success", func(t *testing.T) {
-		validTokenString := "anothervalid"
+		validTokenString := "valid3"
 		mockTokenID, _ := uuid.NewRandom()
 		mockUserID, _ := uuid.NewRandom()
 
@@ -207,10 +252,8 @@ func TestTokens(t *testing.T) {
 
 		assert.Equal(t, http.StatusOK, rr.Code)
 		assert.Equal(t, respBody, rr.Body.Bytes())
-		// mockTokenService.AssertCalled(t, "ValidateRefreshToken", validTokenString)
-		// mockUserService.AssertCalled(t, "Get", getArgs...)
-		// mockTokenService.AssertCalled(t, "NewPairFromUser", newPairArgs...)
+		mockTokenService.AssertCalled(t, "ValidateRefreshToken", validTokenString)
+		mockUserService.AssertCalled(t, "Get", getArgs...)
+		mockTokenService.AssertCalled(t, "NewPairFromUser", newPairArgs...)
 	})
-
-	// TODO - User not found
 }
