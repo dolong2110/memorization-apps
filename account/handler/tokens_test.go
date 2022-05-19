@@ -102,7 +102,7 @@ func TestTokens(t *testing.T) {
 		mockError := apperrors.NewNotFound("user", mockUserID.String())
 		mockUserService.
 			On("Get", getArgs...).
-			Return(nil,  mockError)
+			Return(nil, mockError)
 
 		// a response recorder for getting written http response
 		rr := httptest.NewRecorder()

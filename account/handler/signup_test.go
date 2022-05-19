@@ -69,7 +69,7 @@ func TestSignup(t *testing.T) {
 
 		// create a request body with empty email and password
 		reqBody, err := json.Marshal(gin.H{
-			"email": "long@do",
+			"email":    "long@do",
 			"password": "secret123456",
 		})
 		assert.NoError(t, err)
@@ -103,7 +103,7 @@ func TestSignup(t *testing.T) {
 
 		// create a request body with empty email and password
 		reqBody, err := json.Marshal(gin.H{
-			"email": "long@do.com",
+			"email":    "long@do.com",
 			"password": "long",
 		})
 		assert.NoError(t, err)
@@ -137,7 +137,7 @@ func TestSignup(t *testing.T) {
 
 		// create a request body with empty email and password
 		reqBody, err := json.Marshal(gin.H{
-			"email": "long@do.com",
+			"email":    "long@do.com",
 			"password": "long123456789101112131415161718192021222324252627282930",
 		})
 		assert.NoError(t, err)

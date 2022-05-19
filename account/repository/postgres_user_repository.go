@@ -54,7 +54,6 @@ func (r *pGUserRepository) FindByEmail(ctx context.Context, email string) (*mode
 	return user, nil
 }
 
-
 // FindByID fetches user by id
 func (r *pGUserRepository) FindByID(ctx context.Context, uid uuid.UUID) (*model.User, error) {
 	user := &model.User{}

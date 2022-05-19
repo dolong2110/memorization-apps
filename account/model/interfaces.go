@@ -20,7 +20,7 @@ type UserService interface {
 type TokenService interface {
 	NewPairFromUser(ctx context.Context, user *User, prevRefreshTokenID string) (*Token, error)
 	Signout(ctx context.Context, uid uuid.UUID) error
-	ValidateIDToken(idTokenString string) (*User, error) // jwt not require context, and we not do anything in repository or db that cancel or modify context
+	ValidateIDToken(idTokenString string) (*User, error)                   // jwt not require context, and we not do anything in repository or db that cancel or modify context
 	ValidateRefreshToken(refreshTokenString string) (*RefreshToken, error) // not need context because not reach DB or other layer.
 }
 

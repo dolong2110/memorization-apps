@@ -25,7 +25,7 @@ func TestSignin(t *testing.T) {
 	router := gin.Default()
 
 	NewHandler(&Config{
-		Engine:            router,
+		Engine:       router,
 		UserService:  mockUserService,
 		TokenService: mockTokenService,
 	})

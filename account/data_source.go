@@ -12,7 +12,7 @@ import (
 )
 
 type dataSources struct {
-	DB 			*sqlx.DB
+	DB          *sqlx.DB
 	RedisClient *redis.Client
 }
 
