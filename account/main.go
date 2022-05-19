@@ -39,7 +39,7 @@ func main() {
 	log.Printf("Listening on port %v\n", srv.Addr)
 
 	// Wait for kill signal of channel
-	quit := make(chan os.Signal)
+	quit := make(chan os.Signal, 1)
 
 	var signalsToIgnore = []os.Signal{os.Interrupt}
 	signal.Notify(quit, signalsToIgnore...)
