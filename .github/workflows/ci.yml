@@ -1,4 +1,4 @@
-name: build
+name: Build and Test
 
 on:
   push:
@@ -29,11 +29,11 @@ jobs:
       - name: Build
         working-directory: ./account
         run: go build -v ./...
-#      - name: Run Golang CI Lint
-#        uses: golangci/golangci-lint-action@v2
-#        with:
-#          version: latest
-#          args: -E gofmt
+      #      - name: Run Golang CI Lint
+      #        uses: golangci/golangci-lint-action@v2
+      #        with:
+      #          version: latest
+      #          args: -E gofmt
       - name: Generate coverage report
         working-directory: ./account
         run: |
@@ -50,7 +50,6 @@ jobs:
           go vet ./...
           staticcheck ./...
           golint -set_exit_status=1 ./...
-
   codespell:
     name: Check for spelling errors
     runs-on: ubuntu-latest
