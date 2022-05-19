@@ -37,6 +37,21 @@ jobs:
 #      - name: run Unit tests.
 #        working-directory: ./account
 #        run: go test -v -cover ./...
+
+  codespell:
+    name: Check for spelling errors
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: codespell-project/actions-codespell@master
+        with:
+          ignore_words_list: "anw"
+          skip: "go.mod,go.sum,Makefile,docker-compose.yml"
+
+  codecov:
+    name: codecov test
+    runs-on: ubuntu-latest
+    steps:
       - name: Generate coverage report
         working-directory: ./account
         run: |
@@ -48,16 +63,7 @@ jobs:
           file: ./coverage.txt
           flags: unittests
       - name: Run Vet & Lint
+        working-directory: ./account
         run: |
           go vet .
           golint -set_exit_status=1
-
-  codespell:
-    name: Check for spelling errors
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: codespell-project/actions-codespell@master
-        with:
-          ignore_words_list: "anw"
-          skip: "go.mod,go.sum,Makefile,docker-compose.yml"
