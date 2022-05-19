@@ -21,11 +21,6 @@ jobs:
         id: go
         with:
           go-version: ^1.18
-      - name: Install dependencies
-        working-directory: ./account
-        run: |
-          go version
-          go get -u golang.org/x/lint/golint
       - name: Build
         working-directory: ./account
         run: go build .
@@ -51,7 +46,7 @@ jobs:
         working-directory: ./account
         run: |
           go vet ./...
-          golint -set_exit_status=1 ./...
+#          golint -set_exit_status=1 ./...
 
   codespell:
     name: Check for spelling errors
