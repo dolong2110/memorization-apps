@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    name: Continuos Integration
+    name: Continuous Integration
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -34,9 +34,23 @@ jobs:
 #        with:
 #          version: latest
 #          args: -E gofmt
-      - name: run Unit tests.
+#      - name: run Unit tests.
+#        working-directory: ./account
+#        run: go test -v -cover ./...
+      - name: Generate coverage report
         working-directory: ./account
-        run: go test -v -cover ./...
+        run: |
+          go test `go list ./... | grep -v examples` -coverprofile=coverage.txt -covermode=atomic
+      - name: Upload coverage report
+        uses: codecov/codecov-action@v1.0.2
+        with:
+          token: ZzIfRhpAnx
+          file: ./coverage.txt
+          flags: unittests
+      - name: Run Vet & Lint
+        run: |
+          go vet .
+          golint -set_exit_status=1
 
   codespell:
     name: Check for spelling errors
