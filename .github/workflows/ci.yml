@@ -29,9 +29,6 @@ jobs:
 #        with:
 #          version: latest
 #          args: -E gofmt
-#      - name: run Unit tests.
-#        working-directory: ./account
-#        run: go test -v -cover ./...
       - name: Generate coverage report
         working-directory: ./account
         run: |
