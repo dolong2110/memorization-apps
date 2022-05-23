@@ -7,6 +7,7 @@ import (
 	"github.com/dolong2110/Memoirization-Apps/account/utils"
 	"github.com/google/uuid"
 	"log"
+	"mime/multipart"
 )
 
 // userService acts as a struct for injecting an implementation of UserRepository
@@ -99,4 +100,43 @@ func (s *userService) UpdateDetails(ctx context.Context, user *model.User) error
 	// }
 
 	return nil
+}
+
+func (s *userService) SetProfileImage(
+	ctx context.Context,
+	uid uuid.UUID,
+	imageFileHeader *multipart.FileHeader,
+) (*model.User, error) {
+	u, err := s.UserRepository.FindByID(ctx, uid)
+
+	if err != nil {
+		return nil, err
+	}
+
+	objName, err := utils.ObjNameFromURL(u.ImageURL)
+	if err != nil {
+		return nil, err
+	}
+
+	imageFile, err := imageFileHeader.Open()
+	if err != nil {
+		log.Printf("Failed to open image file: %v\n", err)
+		return nil, apperrors.NewInternal()
+	}
+
+	// Upload user's image to ImageRepository
+	// Possibly received updated imageURL
+	imageURL, err := s.ImageRepository.UpdateProfile(ctx, objName, imageFile)
+	if err != nil {
+		log.Printf("Unable to upload image to cloud provider: %v\n", err)
+		return nil, err
+	}
+
+	updatedUser, err := s.UserRepository.UpdateImage(ctx, u.UID, imageURL)
+	if err != nil {
+		log.Printf("Unable to update imageURL: %v\n", err)
+		return nil, err
+	}
+
+	return updatedUser, nil
 }
