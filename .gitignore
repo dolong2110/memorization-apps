@@ -2,3 +2,4 @@
 account/.env.dev
 *.pem
 .vscode
+account/serviceAccount.json

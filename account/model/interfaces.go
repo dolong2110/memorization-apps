@@ -40,3 +40,10 @@ type TokenRepository interface {
 	DeleteRefreshToken(ctx context.Context, userID string, prevTokenID string) error
 	DeleteUserRefreshToken(ctx context.Context, userID string) error
 }
+
+// ImageRepository defines methods it expects a repository
+// it interacts with to implement
+type ImageRepository interface {
+	//DeleteProfile(ctx context.Context, objName string) error
+	//UpdateProfile(ctx context.Context, objName string, imageFile multipart.File) (string, error)
+}

@@ -27,11 +27,15 @@ func inject(d *dataSources) (*gin.Engine, error) {
 	userRepository := repository.NewUserRepository(d.DB)
 	tokenRepository := repository.NewTokenRepository(d.RedisClient)
 
+	bucketName := os.Getenv("GCP_IMAGE_BUCKET")
+	imageRepository := repository.NewImageRepository(d.StorageClient, bucketName)
+
 	/*
 	 * service layer
 	 */
 	userService := service.NewUserService(&service.USConfig{
-		UserRepository: userRepository,
+		UserRepository:  userRepository,
+		ImageRepository: imageRepository,
 	})
 
 	// load rsa keys
