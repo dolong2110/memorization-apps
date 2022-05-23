@@ -101,12 +101,19 @@ func inject(d *dataSources) (*gin.Engine, error) {
 		return nil, fmt.Errorf("could not parse HANDLER_TIMEOUT as int: %w", err)
 	}
 
+	maxBodyBytesStr := os.Getenv("MAX_BODY_BYTES")
+	maxBodyBytesInt, err := strconv.ParseInt(maxBodyBytesStr, 0, 64)
+	if err != nil {
+		return nil, fmt.Errorf("could not parse MAX_BODY_BYTES as int: %w", err)
+	}
+
 	handler.NewHandler(&handler.Config{
 		Engine:          router,
 		UserService:     userService,
 		TokenService:    tokenService,
 		BaseURL:         baseURL,
 		TimeoutDuration: time.Duration(timeoutInt) * time.Second,
+		MaxBodyBytes:    maxBodyBytesInt,
 	})
 
 	return router, nil
