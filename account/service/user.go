@@ -107,13 +107,12 @@ func (s *userService) SetProfileImage(
 	uid uuid.UUID,
 	imageFileHeader *multipart.FileHeader,
 ) (*model.User, error) {
-	u, err := s.UserRepository.FindByID(ctx, uid)
-
+	user, err := s.UserRepository.FindByID(ctx, uid)
 	if err != nil {
 		return nil, err
 	}
 
-	objName, err := utils.ObjNameFromURL(u.ImageURL)
+	objName, err := utils.ObjNameFromURL(user.ImageURL)
 	if err != nil {
 		return nil, err
 	}
@@ -132,7 +131,7 @@ func (s *userService) SetProfileImage(
 		return nil, err
 	}
 
-	updatedUser, err := s.UserRepository.UpdateImage(ctx, u.UID, imageURL)
+	updatedUser, err := s.UserRepository.UpdateImage(ctx, user.UID, imageURL)
 	if err != nil {
 		log.Printf("Unable to update imageURL: %v\n", err)
 		return nil, err

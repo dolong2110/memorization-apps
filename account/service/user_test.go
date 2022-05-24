@@ -128,7 +128,7 @@ func TestSignup(t *testing.T) {
 func TestSignin(t *testing.T) {
 	// setup valid email/pw combo with hashed password to test method
 	// response when provided password is invalid
-	email := "bob@bob.com"
+	email := "longb@dp.com"
 	validPW := "howdyhoneighbor!"
 	hashedValidPW, _ := utils.HashPassword(validPW)
 	invalidPW := "howdyhodufus!"
@@ -213,9 +213,9 @@ func TestUpdateDetails(t *testing.T) {
 
 		mockUser := &model.User{
 			UID:     uid,
-			Email:   "new@bob.com",
-			Website: "https://jacobgoodwin.me",
-			Name:    "A New Bob!",
+			Email:   "new@long.com",
+			Website: "https://dolong2110.me",
+			Name:    "A New Long!",
 		}
 
 		mockArgs := mock.Arguments{
@@ -277,9 +277,9 @@ func TestSetProfileImage(t *testing.T) {
 		// does not have have imageURL
 		mockUser := &model.User{
 			UID:     uid,
-			Email:   "new@bob.com",
-			Website: "https://jacobgoodwin.me",
-			Name:    "A New Bob!",
+			Email:   "new@long.com",
+			Website: "https://dolong2110.me",
+			Name:    "A New Long!",
 		}
 
 		findByIDArgs := mock.Arguments{
@@ -313,9 +313,9 @@ func TestSetProfileImage(t *testing.T) {
 
 		mockUpdatedUser := &model.User{
 			UID:      uid,
-			Email:    "new@bob.com",
-			Website:  "https://jacobgoodwin.me",
-			Name:     "A New Bob!",
+			Email:    "new@long.com",
+			Website:  "https://dolong2110.me",
+			Name:     "A New Long!",
 			ImageURL: imageURL,
 		}
 
@@ -341,9 +341,9 @@ func TestSetProfileImage(t *testing.T) {
 		// has imageURL
 		mockUser := &model.User{
 			UID:      uid,
-			Email:    "new@bob.com",
-			Website:  "https://jacobgoodwin.me",
-			Name:     "A New Bob!",
+			Email:    "new@long.com",
+			Website:  "https://dolong2110.me",
+			Name:     "A New Long!",
 			ImageURL: imageURL,
 		}
 
@@ -376,9 +376,9 @@ func TestSetProfileImage(t *testing.T) {
 
 		mockUpdatedUser := &model.User{
 			UID:      uid,
-			Email:    "new@bob.com",
-			Website:  "https://jacobgoodwin.me",
-			Name:     "A New Bob!",
+			Email:    "new@long.com",
+			Website:  "https://dolong2110.me",
+			Name:     "A New Long!",
 			ImageURL: imageURL,
 		}
 
@@ -440,9 +440,9 @@ func TestSetProfileImage(t *testing.T) {
 		// has imageURL
 		mockUser := &model.User{
 			UID:      uid,
-			Email:    "new@bob.com",
-			Website:  "https://jacobgoodwin.me",
-			Name:     "A New Bob!",
+			Email:    "new@long.com",
+			Website:  "https://dolong2110.me",
+			Name:     "A New Long!",
 			ImageURL: imageURL,
 		}
 
@@ -485,9 +485,9 @@ func TestSetProfileImage(t *testing.T) {
 		// has imageURL
 		mockUser := &model.User{
 			UID:      uid,
-			Email:    "new@bob.com",
+			Email:    "new@long.com",
 			Website:  "https://dolong2110.me",
-			Name:     "A New Bob!",
+			Name:     "A New Long!",
 			ImageURL: imageURL,
 		}
 
