@@ -94,3 +94,15 @@ func (m *MockUserService) SetProfileImage(
 
 	return r0, r1
 }
+
+// ClearProfileImage is a mock of UserService.DeleteProfileImage
+func (m *MockUserService) DeleteProfileImage(ctx context.Context, uid uuid.UUID) error {
+	ret := m.Called(ctx, uid)
+
+	var r0 error
+	if ret.Get(0) != nil {
+		r0 = ret.Get(0).(error)
+	}
+
+	return r0
+}

@@ -44,9 +44,8 @@ func (s *userService) Get(ctx context.Context, uid uuid.UUID) (*model.User, erro
 // UserRepository Create should handle checking for user exists conflicts
 func (s *userService) Signup(ctx context.Context, user *model.User) error {
 	pwd, err := utils.HashPassword(user.Password)
-
 	if err != nil {
-		log.Printf("Unable to signup user for email: %v\n", user.Email)
+		log.Printf("failed to hash password; email: %v\n", user.Email)
 		return apperrors.NewInternal()
 	}
 
@@ -62,7 +61,7 @@ func (s *userService) Signup(ctx context.Context, user *model.User) error {
 	return nil
 }
 
-// Signin reaches our to a UserRepository check if the user exists
+// Signin reaches out to a UserRepository check if the user exists
 // and then compares the supplied password with the provided password.
 // If a valid email/password combo is provided, u will hold all
 // available user fields
@@ -138,4 +137,36 @@ func (s *userService) SetProfileImage(
 	}
 
 	return updatedUser, nil
+}
+
+// DeleteProfileImage DeleteProfile is used to delete profile image from a user
+func (s *userService) DeleteProfileImage(
+	ctx context.Context,
+	uid uuid.UUID,
+) error {
+	user, err := s.UserRepository.FindByID(ctx, uid)
+	if err != nil {
+		return err
+	}
+
+	if user.ImageURL == "" {
+		return nil
+	}
+
+	objName, err := utils.ObjNameFromURL(user.ImageURL)
+	if err != nil {
+		return err
+	}
+
+	err = s.ImageRepository.DeleteProfile(ctx, objName)
+	if err != nil {
+		return err
+	}
+
+	_, err = s.UserRepository.UpdateImage(ctx, uid, "")
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
