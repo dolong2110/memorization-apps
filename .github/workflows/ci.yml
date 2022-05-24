@@ -41,7 +41,7 @@ jobs:
       - name: Upload coverage report
         uses: codecov/codecov-action@v1.0.2
         with:
-          token: 9262a659-d559-4fe9-acbf-959af9a6c8fa
+          token: 2a2ab5db-5712-4668-9753-c55d541550fb
           file: ./account/coverage.txt
           flags: unittests
       - name: Run Vet & Lint
