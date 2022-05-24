@@ -105,7 +105,6 @@ func (r *pGUserRepository) UpdateImage(ctx context.Context, uid uuid.UUID, image
 	user := &model.User{}
 
 	err := r.DB.GetContext(ctx, user, query, uid, imageURL)
-
 	if err != nil {
 		log.Printf("Error updating image_url in database: %v\n", err)
 		return nil, apperrors.NewInternal()

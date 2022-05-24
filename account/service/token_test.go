@@ -332,12 +332,57 @@ func TestValidateRefreshToken(t *testing.T) {
 		assert.Equal(t, user.UID, validatedRefreshToken.UID)
 	})
 
+	t.Run("invalid signed token", func(t *testing.T) {
+		testRefreshToken, _ := utils.GenerateRefreshToken(user.UID, "secret", refreshExp)
+
+		expectedErr := apperrors.NewAuthorization("Unable to verify user from refresh token")
+
+		_, err := tokenService.ValidateRefreshToken(testRefreshToken.SignedStringToken)
+		assert.EqualError(t, err, expectedErr.Message)
+	})
+
 	t.Run("Expired token", func(t *testing.T) {
 		testRefreshToken, _ := utils.GenerateRefreshToken(user.UID, secret, -1)
 
 		expectedErr := apperrors.NewAuthorization("Unable to verify user from refresh token")
 
 		_, err := tokenService.ValidateRefreshToken(testRefreshToken.SignedStringToken)
+		assert.EqualError(t, err, expectedErr.Message)
+	})
+
+	t.Run("Error Token ID: Not uuid type in uid field of token", func(t *testing.T) {
+		testRefreshToken := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiIxIiwiZXhwIjoxNjUzNTkyMjk2LCJqdGkiOiI1ZGQzNjg3Ny05MTZlLTQ2MTUtOThjNC0zYTllNzVjYjAwNTgiLCJpYXQiOjE2NTMzMzMwOTZ9.JOSzdfhsvUMR6GRP1G-IFnTsQ7CvcLOwpPs86Gy2Z8c"
+
+		expectedErr := apperrors.NewAuthorization("Unable to verify user from refresh token")
+
+		_, err := tokenService.ValidateRefreshToken(testRefreshToken)
+		assert.EqualError(t, err, expectedErr.Message)
+	})
+
+	t.Run("Error Token ID: int type in uid field of token", func(t *testing.T) {
+		testRefreshToken := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEsImV4cCI6MTY1MzU5MjI5NiwianRpIjoiNWRkMzY4NzctOTE2ZS00NjE1LTk4YzQtM2E5ZTc1Y2IwMDU4IiwiaWF0IjoxNjUzMzMzMDk2fQ.wmmhCfV478KBzaE_r6e1WlodrtFCgbzL6RFwRcD2TdU"
+
+		expectedErr := apperrors.NewAuthorization("Unable to verify user from refresh token")
+
+		_, err := tokenService.ValidateRefreshToken(testRefreshToken)
+		assert.EqualError(t, err, expectedErr.Message)
+	})
+
+	t.Run("Error User ID: not uid type in jti field of token", func(t *testing.T) {
+		testRefreshToken := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI3ZDIwYTMzZi1mZTE1LTRmZmQtOTBlZS1kNDRkMDEzYzI2MGUiLCJleHAiOjE2NTM1OTIyOTYsImp0aSI6IjEiLCJpYXQiOjE2NTMzMzMwOTZ9.T8T0GgVhfS9YB7mtcFE7G24BcpaKULYz6iI-w3W434Y"
+
+		expectedErr := apperrors.NewAuthorization("Unable to verify user from refresh token")
+
+		_, err := tokenService.ValidateRefreshToken(testRefreshToken)
+		assert.EqualError(t, err, expectedErr.Message)
+	})
+
+	t.Run("Error Token ID: int type in jti field of token", func(t *testing.T) {
+		testRefreshToken := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI3ZDIwYTMzZi1mZTE1LTRmZmQtOTBlZS1kNDRkMDEzYzI2MGUiLCJleHAiOjE2NTM1OTIyOTYsImp0aSI6MSwiaWF0IjoxNjUzMzMzMDk2fQ.rMHiMc7_UpButhDPcCkfS6UClJDx-K6BKSAXcGgqd78"
+
+		expectedErr := apperrors.NewAuthorization("Unable to verify user from refresh token")
+
+		_, err := tokenService.ValidateRefreshToken(testRefreshToken)
 		assert.EqualError(t, err, expectedErr.Message)
 	})
 }

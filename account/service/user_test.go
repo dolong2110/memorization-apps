@@ -25,7 +25,7 @@ func TestGet(t *testing.T) {
 
 		mockUserResp := &model.User{
 			UID:   uid,
-			Email: "bob@bob.com",
+			Email: "long@do.com",
 			Name:  "Bobby Boson",
 		}
 
@@ -532,6 +532,4 @@ func TestSetProfileImage(t *testing.T) {
 		mockImageRepository.AssertCalled(t, "UpdateProfile", updateProfileArgs...)
 		mockUserRepository.AssertCalled(t, "UpdateImage", updateImageArgs...)
 	})
-
-	// TODO - Create non image file for test
 }
