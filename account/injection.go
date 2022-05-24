@@ -41,13 +41,11 @@ func inject(d *dataSources) (*gin.Engine, error) {
 	// load rsa keys
 	privateKeyFile := os.Getenv("PRIVATE_KEY_FILE")
 	privateKeyByte, err := ioutil.ReadFile(privateKeyFile)
-
 	if err != nil {
 		return nil, fmt.Errorf("could not read private key pem file: %w", err)
 	}
 
 	privateKey, err := jwt.ParseRSAPrivateKeyFromPEM(privateKeyByte)
-
 	if err != nil {
 		return nil, fmt.Errorf("could not parse private key: %w", err)
 	}

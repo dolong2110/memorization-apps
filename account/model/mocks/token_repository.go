@@ -18,7 +18,6 @@ func (m *MockTokenRepository) SetRefreshToken(ctx context.Context, userID string
 	ret := m.Called(ctx, userID, tokenID, expiresIn)
 
 	var r0 error
-
 	if ret.Get(0) != nil {
 		r0 = ret.Get(0).(error)
 	}

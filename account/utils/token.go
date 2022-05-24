@@ -78,8 +78,6 @@ func ValidateIDToken(tokenString string, key *rsa.PublicKey) (*model.IDTokenCust
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
 		return key, nil
 	})
-
-	// For now we'll just return the error and handle logging in service level
 	if err != nil {
 		return nil, err
 	}
