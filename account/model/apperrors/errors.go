@@ -26,7 +26,12 @@ const (
 // error type/message from API endpoints
 type Error struct {
 	Type    Type   `json:"type"`
+	Code    int    `json:"code"`
 	Message string `json:"message"`
+}
+
+type ErrorResponse struct {
+	Error *Error `json:"error"`
 }
 
 // Error satisfies standard error interface
@@ -81,6 +86,7 @@ func Status(err error) int {
 func NewAuthorization(reason string) *Error {
 	return &Error{
 		Type:    Authorization,
+		Code:    http.StatusUnauthorized,
 		Message: reason,
 	}
 }
@@ -89,7 +95,8 @@ func NewAuthorization(reason string) *Error {
 func NewBadRequest(reason string) *Error {
 	return &Error{
 		Type:    BadRequest,
-		Message: fmt.Sprintf("Bad request. Reason: %v", reason),
+		Code:    http.StatusBadRequest,
+		Message: reason,
 	}
 }
 
@@ -97,6 +104,7 @@ func NewBadRequest(reason string) *Error {
 func NewConflict(name string, value string) *Error {
 	return &Error{
 		Type:    Conflict,
+		Code:    http.StatusConflict,
 		Message: fmt.Sprintf("resource: %v with value: %v already exists", name, value),
 	}
 }
@@ -105,6 +113,7 @@ func NewConflict(name string, value string) *Error {
 func NewInternal() *Error {
 	return &Error{
 		Type:    Internal,
+		Code:    http.StatusInternalServerError,
 		Message: "Internal server error.",
 	}
 }
@@ -113,6 +122,7 @@ func NewInternal() *Error {
 func NewNotFound(name string, value string) *Error {
 	return &Error{
 		Type:    NotFound,
+		Code:    http.StatusNotFound,
 		Message: fmt.Sprintf("resource: %v with value: %v not found", name, value),
 	}
 }
@@ -121,6 +131,7 @@ func NewNotFound(name string, value string) *Error {
 func NewPayloadTooLarge(maxBodySize int64, contentLength int64) *Error {
 	return &Error{
 		Type:    PayloadTooLarge,
+		Code:    http.StatusRequestEntityTooLarge,
 		Message: fmt.Sprintf("Max payload size of %v exceeded. Actual payload size: %v", maxBodySize, contentLength),
 	}
 }
@@ -129,6 +140,7 @@ func NewPayloadTooLarge(maxBodySize int64, contentLength int64) *Error {
 func NewServiceUnavailable() *Error {
 	return &Error{
 		Type:    ServiceUnavailable,
+		Code:    http.StatusServiceUnavailable,
 		Message: "Service unavailable or timed out",
 	}
 }
@@ -137,6 +149,7 @@ func NewServiceUnavailable() *Error {
 func NewUnsupportedMediaType(reason string) *Error {
 	return &Error{
 		Type:    UnsupportedMediaType,
+		Code:    http.StatusUnsupportedMediaType,
 		Message: reason,
 	}
 }

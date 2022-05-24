@@ -30,18 +30,8 @@ func (h *Handler) Image(c *gin.Context) {
 			})
 			return
 		}
-		e := apperrors.NewBadRequest("Unable to parse multipart/form-data")
-		c.JSON(e.Status(), gin.H{
-			"error": e,
-		})
-		return
-	}
-
-	if imageFileHeader == nil {
-		e := apperrors.NewBadRequest("Must include an imageFile")
-		c.JSON(e.Status(), gin.H{
-			"error": e,
-		})
+		e := apperrors.NewBadRequest("Unable to parse image from multipart/form-data")
+		c.JSON(e.Status(), apperrors.ErrorResponse{Error: e})
 		return
 	}
 

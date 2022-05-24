@@ -10,6 +10,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -72,18 +73,20 @@ func TestImage(t *testing.T) {
 		mockUserService.AssertCalled(t, "SetProfileImage", setProfileImageArgs...)
 	})
 
-	t.Run("Disallowed mimetype", func(t *testing.T) {
+	t.Run("No image file provided", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 
-		multipartImageFixture := fixture.NewMultipartImage("image.txt", "mage/svg+xml")
-		defer multipartImageFixture.Close()
-
-		request, _ := http.NewRequest(http.MethodPost, "/image", multipartImageFixture.MultipartBody)
+		request, _ := http.NewRequest(http.MethodPost, "/image", nil)
 		request.Header.Set("Content-Type", "multipart/form-data")
 
 		router.ServeHTTP(rr, request)
+		body, _ := ioutil.ReadAll(rr.Body)
 
-		assert.Equal(t, http.StatusBadRequest, rr.Code)
+		var resp apperrors.ErrorResponse
+		_ = json.Unmarshal(body, &resp)
+
+		assert.Equal(t, http.StatusBadRequest, resp.Error.Code)
+		assert.Equal(t, "Unable to parse image from multipart/form-data", resp.Error.Message)
 
 		mockUserService.AssertNotCalled(t, "SetProfileImage")
 	})
@@ -95,11 +98,58 @@ func TestImage(t *testing.T) {
 		request.Header.Set("Content-Type", "multipart/form-data")
 
 		router.ServeHTTP(rr, request)
+		body, _ := ioutil.ReadAll(rr.Body)
 
-		assert.Equal(t, http.StatusBadRequest, rr.Code)
+		var resp apperrors.ErrorResponse
+		_ = json.Unmarshal(body, &resp)
+
+		assert.Equal(t, http.StatusBadRequest, resp.Error.Code)
+		assert.Equal(t, "Unable to parse image from multipart/form-data", resp.Error.Message)
 
 		mockUserService.AssertNotCalled(t, "SetProfileImage")
 	})
+
+	t.Run("Disallowed mimetype", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+
+		multipartImageFixture := fixture.NewMultipartImage("image.txt", "mage/svg+xml")
+		defer multipartImageFixture.Close()
+
+		request, _ := http.NewRequest(http.MethodPost, "/image", multipartImageFixture.MultipartBody)
+		request.Header.Set("Content-Type", "multipart/form-data")
+
+		router.ServeHTTP(rr, request)
+		body, _ := ioutil.ReadAll(rr.Body)
+
+		var resp apperrors.ErrorResponse
+		_ = json.Unmarshal(body, &resp)
+
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
+		assert.Equal(t, "Unable to parse image from multipart/form-data", resp.Error.Message)
+
+		mockUserService.AssertNotCalled(t, "SetProfileImage")
+	})
+
+	//t.Run("Not an image", func(t *testing.T) {
+	//	rr := httptest.NewRecorder()
+	//
+	//	multipartImageFixture := fixture.NewMultipartImage("image.png", "mage/svg+xml")
+	//	defer multipartImageFixture.Close()
+	//
+	//	request, _ := http.NewRequest(http.MethodPost, "/image", multipartImageFixture.MultipartBody)
+	//	request.Header.Set("Content-Type", "multipart/form-data")
+	//
+	//	router.ServeHTTP(rr, request)
+	//	body, _ := ioutil.ReadAll(rr.Body)
+	//
+	//	var resp apperrors.ErrorResponse
+	//	_ = json.Unmarshal(body, &resp)
+	//
+	//	assert.Equal(t, http.StatusBadRequest, rr.Code)
+	//	assert.Equal(t, "imageFile must be 'image/jpeg' or 'image/png'", resp.Error.Message)
+	//
+	//	mockUserService.AssertNotCalled(t, "SetProfileImage")
+	//})
 
 	t.Run("Error from SetProfileImage", func(t *testing.T) {
 		// create unique context user for this test
