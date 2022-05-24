@@ -30,6 +30,7 @@ type Error struct {
 	Message string `json:"message"`
 }
 
+// ErrorResponse return response for error
 type ErrorResponse struct {
 	Error *Error `json:"error"`
 }
