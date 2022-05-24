@@ -62,8 +62,8 @@ func TestImage(t *testing.T) {
 		router.ServeHTTP(rr, request)
 
 		respBody, _ := json.Marshal(gin.H{
-			"imageUrl": imageURL,
-			"message":  "success",
+			"image_url": imageURL,
+			"message":   "success",
 		})
 
 		assert.Equal(t, http.StatusOK, rr.Code)

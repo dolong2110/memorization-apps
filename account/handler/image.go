@@ -68,7 +68,7 @@ func (h *Handler) Image(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"imageUrl": updatedUser.ImageURL,
-		"message":  "success",
+		"image_url": updatedUser.ImageURL,
+		"message":   "success",
 	})
 }
