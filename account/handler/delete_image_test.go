@@ -46,7 +46,7 @@ func TestDeleteImage(t *testing.T) {
 		}
 
 		errorResp := apperrors.NewInternal()
-		mockUserService.On("ClearProfileImage", clearProfileImageArgs...).Return(errorResp)
+		mockUserService.On("DeleteProfileImage", clearProfileImageArgs...).Return(errorResp)
 
 		request, _ := http.NewRequest(http.MethodDelete, "/image", nil)
 		router.ServeHTTP(rr, request)
@@ -57,7 +57,7 @@ func TestDeleteImage(t *testing.T) {
 
 		assert.Equal(t, apperrors.Status(errorResp), rr.Code)
 		assert.Equal(t, respBody, rr.Body.Bytes())
-		mockUserService.AssertCalled(t, "ClearProfileImage", clearProfileImageArgs...)
+		mockUserService.AssertCalled(t, "DeleteProfileImage", clearProfileImageArgs...)
 	})
 
 	t.Run("Success", func(t *testing.T) {
@@ -87,12 +87,12 @@ func TestDeleteImage(t *testing.T) {
 			ctxUser.UID,
 		}
 
-		mockUserService.On("ClearProfileImage", clearProfileImageArgs...).Return(nil)
+		mockUserService.On("DeleteProfileImage", clearProfileImageArgs...).Return(nil)
 
 		request, _ := http.NewRequest(http.MethodDelete, "/image", nil)
 		router.ServeHTTP(rr, request)
 
 		assert.Equal(t, http.StatusOK, rr.Code)
-		mockUserService.AssertCalled(t, "ClearProfileImage", clearProfileImageArgs...)
+		mockUserService.AssertCalled(t, "DeleteProfileImage", clearProfileImageArgs...)
 	})
 }
