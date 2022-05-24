@@ -11,6 +11,7 @@ type MockTokenUtils struct {
 	mock.Mock
 }
 
+// ValidateIDToken test function in utils folder
 func (m *MockTokenUtils) ValidateIDToken(tokenString string, key *rsa.PublicKey) (*model.IDTokenCustomClaims, error) {
 	ret := m.Called(tokenString, key)
 
@@ -27,6 +28,7 @@ func (m *MockTokenUtils) ValidateIDToken(tokenString string, key *rsa.PublicKey)
 	return r0, r1
 }
 
+// ValidateRefreshToken test function in utils folder
 func (m *MockTokenUtils) ValidateRefreshToken(tokenString string, key string) (*model.User, error) {
 	ret := m.Called(tokenString, key)
 
