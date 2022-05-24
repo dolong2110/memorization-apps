@@ -21,6 +21,7 @@ func IsAllowedImageType(mimeType string) bool {
 	return exists
 }
 
+// ObjNameFromURL get base image from given url
 func ObjNameFromURL(imageURL string) (string, error) {
 	// if user doesn't have imageURL - create one
 	// otherwise, extract last part of URL to get cloud storage object name
