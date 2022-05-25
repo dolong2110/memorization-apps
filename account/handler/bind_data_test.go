@@ -59,7 +59,7 @@ func TestBindData(t *testing.T) {
 			Header: make(http.Header),
 		}
 
-		mocks.MockJsonPost(ctx, map[string]interface{}{"foo": "bar"})
+		mocks.MockJSONPost(ctx, map[string]interface{}{"foo": "bar"})
 		res := bindData(ctx, map[string]interface{}{"foo": "bar"})
 
 		assert.Equal(t, false, res)
