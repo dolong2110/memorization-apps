@@ -22,7 +22,7 @@ func (h *Handler) Image(c *gin.Context) {
 	// check for error before checking for non-nil header
 	if err != nil {
 		// should be a validation error
-		log.Printf("Unable parse multipart/form-data: %+v", err)
+		log.Printf("Unable parse mage from multipart/form-data: %+v", err)
 
 		if err.Error() == "http: request body too large" {
 			c.JSON(http.StatusRequestEntityTooLarge, gin.H{

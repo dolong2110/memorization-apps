@@ -24,9 +24,7 @@ func bindData(c *gin.Context, req interface{}) bool {
 
 		err := apperrors.NewUnsupportedMediaType(msg)
 
-		c.JSON(err.Status(), gin.H{
-			"error": err,
-		})
+		c.JSON(err.Status(), apperrors.ErrorResponse{Error: err})
 		return false
 	}
 
@@ -60,7 +58,7 @@ func bindData(c *gin.Context, req interface{}) bool {
 		// we'll fall back and return an internal server error
 		fallBack := apperrors.NewInternal()
 
-		c.JSON(fallBack.Status(), gin.H{"error": fallBack})
+		c.JSON(fallBack.Status(), apperrors.ErrorResponse{Error: fallBack})
 		return false
 	}
 
