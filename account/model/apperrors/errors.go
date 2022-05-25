@@ -30,9 +30,10 @@ type Error struct {
 	Message string `json:"message"`
 }
 
-// ErrorResponse return response for error
-type ErrorResponse struct {
-	Error *Error `json:"error"`
+// Response return response for error
+type Response struct {
+	Error *Error      `json:"error,omitempty"`
+	Data  interface{} `json:"data,omitempty"`
 }
 
 // Error satisfies standard error interface

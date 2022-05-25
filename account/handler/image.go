@@ -31,7 +31,7 @@ func (h *Handler) Image(c *gin.Context) {
 			return
 		}
 		e := apperrors.NewBadRequest("Unable to parse image from multipart/form-data")
-		c.JSON(e.Status(), apperrors.ErrorResponse{Error: e})
+		c.JSON(e.Status(), apperrors.Response{Error: e})
 		return
 	}
 

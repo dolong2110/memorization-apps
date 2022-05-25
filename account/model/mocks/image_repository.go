@@ -25,7 +25,6 @@ func (m *MockImageRepository) UpdateProfile(ctx context.Context, objName string,
 	}
 
 	var r1 error
-
 	if ret.Get(1) != nil {
 		r1 = ret.Get(1).(error)
 	}

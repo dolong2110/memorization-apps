@@ -82,7 +82,7 @@ func TestImage(t *testing.T) {
 		router.ServeHTTP(rr, request)
 		body, _ := ioutil.ReadAll(rr.Body)
 
-		var resp apperrors.ErrorResponse
+		var resp apperrors.Response
 		_ = json.Unmarshal(body, &resp)
 
 		assert.Equal(t, http.StatusBadRequest, resp.Error.Code)
@@ -100,7 +100,7 @@ func TestImage(t *testing.T) {
 		router.ServeHTTP(rr, request)
 		body, _ := ioutil.ReadAll(rr.Body)
 
-		var resp apperrors.ErrorResponse
+		var resp apperrors.Response
 		_ = json.Unmarshal(body, &resp)
 
 		assert.Equal(t, http.StatusBadRequest, resp.Error.Code)
@@ -121,7 +121,7 @@ func TestImage(t *testing.T) {
 		router.ServeHTTP(rr, request)
 		body, _ := ioutil.ReadAll(rr.Body)
 
-		var resp apperrors.ErrorResponse
+		var resp apperrors.Response
 		_ = json.Unmarshal(body, &resp)
 
 		assert.Equal(t, http.StatusBadRequest, rr.Code)
@@ -142,7 +142,7 @@ func TestImage(t *testing.T) {
 	//	router.ServeHTTP(rr, request)
 	//	body, _ := ioutil.ReadAll(rr.Body)
 	//
-	//	var resp apperrors.ErrorResponse
+	//	var resp apperrors.Response
 	//	_ = json.Unmarshal(body, &resp)
 	//
 	//	assert.Equal(t, http.StatusBadRequest, rr.Code)
