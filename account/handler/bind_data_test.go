@@ -7,28 +7,13 @@ import (
 	"github.com/dolong2110/Memoirization-Apps/account/model/mocks"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 )
 
-type MockBindData struct {
-	mock.Mock
-}
-
-func (m *MockBindData) bindData(ctx *gin.Context, req interface{}) bool {
-	ret := m.Called(ctx, req)
-
-	var r0 bool
-	if ret.Get(0) != nil {
-		r0 = ret.Get(1).(bool)
-	}
-
-	return r0
-}
-
+// Test BindData test for bind data
 func TestBindData(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 

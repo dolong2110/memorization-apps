@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 )
 
+// MockJsonPost mock test for context with json
 func MockJsonPost(c *gin.Context, content interface{}) {
 	c.Request.Method = "POST" // or PUT
 	c.Request.Header.Set("Content-Type", "application/json")
