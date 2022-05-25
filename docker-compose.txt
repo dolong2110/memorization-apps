@@ -1,0 +1,94 @@
+version: "3.8"
+# this services define various containers will be used in development
+# here there are two containers: reverse-proxy and account
+services:
+    # traffic tool that handle the routing of url
+    reverse-proxy:
+        # The official v2 Traefik docker image
+        image: traefik:v2.2
+        # Enables the web UI and tells Traefik to listen to docker
+        command:
+            # allow use http without tls
+            - "--api.insecure=true"
+            # this reverse proxy needs look into other docker containers to route traffic to
+            - "--providers.docker"
+            # not expose every docker containers by default; for ex: we not want to expose to postgres and redis
+            # so we if we want to expose it we must enable it at exact container - in labels of account and account-client
+            - "--providers.docker.exposedByDefault=false"
+        # set up port want to expose
+        ports:
+        # The HTTP port. List 2 ports. Left is port on our host machine. Right is port on inside of the container
+            - "80:80"
+        # The Web UI (enabled by --api.insecure=true)
+            - "8080:8080"
+        volumes:
+        # So that Traefik can listen to the Docker events
+            - /var/run/docker.sock:/var/run/docker.sock
+    # set up postgres db in the container
+    postgres-account:
+        image: "postgres:alpine"
+        environment:
+            - POSTGRES_PASSWORD=password
+        ports:
+            - "5432:5432"
+        #   Set a volume for data and initial sql script
+        #   May configure initial db for future demo
+        volumes:
+            # here uses volume pgdata_account -> need create volume key at bottom of this file to be able to use this
+            - "pgdata_account:/var/lib/postgresql/data"
+            # - ./init:/docker-entrypoint-initdb.d/
+        command: [ "postgres", "-c", "log_statement=all" ]
+    redis-account:
+        image: "redis:alpine"
+        ports:
+            - "6379:6379"
+        volumes:
+            - "redisdata:/data"
+    # it hosts docker container made in account/Dockerfile
+    account:
+        build:
+            context: ./account
+            # builder is the name of the first stage in the account/Dockerfile
+            target: builder
+        # give image name
+        image: account
+        # add env file to container
+        env_file: ./account/.env.dev
+        expose:
+            - "8080"
+        # labels tells traffic to look for this container
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.account.rule=Host(`malcorp.test`) && PathPrefix(`/api/account`)"
+        # sets and environment variable inside of container
+        environment:
+            - ENV=dev
+        volumes:
+            # map folders inside /account into folder inside container
+            - ./account:/go/src/app
+        # the account container must depend on the postgres container
+        depends_on:
+            - postgres-account
+            - redis-account
+            - reverse-proxy
+        # have to use $$ (double-dollar) so docker doesn't try to substitute a variable
+        command: reflex -r "\.go$$" -s -- sh -c "go run ./"
+    account-client:
+        build:
+            context: ./account-client
+        image: account-client # if we don't give image name, traefik won't create router 🤷‍♂️
+        expose:
+            - "3000"
+        ports:
+            - "3000:3000"
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.account-client.rule=Host(`malcorp.test`) && PathPrefix(`/account`)"
+        volumes:
+            - ./account-client:/app
+            - /app/node_modules #avoid overwriting node_modules
+        depends_on:
+            - reverse-proxy
+volumes:
+    pgdata_account:
+    redisdata:

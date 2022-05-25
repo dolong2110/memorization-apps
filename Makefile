@@ -32,7 +32,7 @@ create-keypair:
 # run postgres containers in docker-compose
 # migrate down
 # migrate up
-# docker-compose dwon
+# docker-compose down
 init:
 	docker-compose up -d postgres-account && \
 	$(MAKE) create-keypair ENV=dev && \
