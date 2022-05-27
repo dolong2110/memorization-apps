@@ -3,9 +3,10 @@ package main
 import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
-	"github.com/dolong2110/Memoirization-Apps/account/handler"
-	"github.com/dolong2110/Memoirization-Apps/account/repository"
-	"github.com/dolong2110/Memoirization-Apps/account/service"
+	"github.com/dolong2110/memorization-apps/account/handler"
+	"github.com/dolong2110/memorization-apps/account/repository"
+	"github.com/dolong2110/memorization-apps/account/service"
+
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
 	"log"

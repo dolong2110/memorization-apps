@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"github.com/dolong2110/Memoirization-Apps/account/model"
-	"github.com/dolong2110/Memoirization-Apps/account/model/apperrors"
+	"github.com/dolong2110/memorization-apps/account/model"
+	"github.com/dolong2110/memorization-apps/account/model/apperrors"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"

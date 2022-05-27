@@ -4,7 +4,7 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"fmt"
-	"github.com/dolong2110/Memoirization-Apps/account/model"
+	"github.com/dolong2110/memorization-apps/account/model"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/ssh"
 	"log"

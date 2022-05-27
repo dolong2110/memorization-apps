@@ -2,7 +2,7 @@ package mocks
 
 import (
 	"context"
-	"github.com/dolong2110/Memoirization-Apps/account/model"
+	"github.com/dolong2110/memorization-apps/account/model"
 	"mime/multipart"
 
 	"github.com/google/uuid"

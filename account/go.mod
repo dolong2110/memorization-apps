@@ -1,4 +1,4 @@
-module github.com/dolong2110/Memoirization-Apps/account
+module github.com/dolong2110/memorization-apps/account
 
 go 1.16
 

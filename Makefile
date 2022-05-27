@@ -35,7 +35,8 @@ create-keypair:
 # docker-compose down
 init:
 	docker-compose up -d postgres-account && \
-	$(MAKE) create-keypair ENV=dev && \
+	$(MAKE) create-keypair ENV=dev && \mod tidy
+
 	$(MAKE) create-keypair ENV=test && \
 	$(MAKE) migrate-down APPPATH=account N= && \
 	$(MAKE) migrate-up APPPATH=account N= && \

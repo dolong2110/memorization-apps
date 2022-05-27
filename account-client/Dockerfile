@@ -15,4 +15,4 @@ RUN npm install
 # copy project files and folders to the current working directory (i.e. 'app' folder)
 COPY . .
 
-CMD [ "npm", "run", "dev", "--", "--host" ]
+CMD [ "npm", "run", "dev" ]

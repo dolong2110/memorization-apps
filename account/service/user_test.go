@@ -3,11 +3,12 @@ package service
 import (
 	"context"
 	"fmt"
-	"github.com/dolong2110/Memoirization-Apps/account/model"
-	"github.com/dolong2110/Memoirization-Apps/account/model/apperrors"
-	"github.com/dolong2110/Memoirization-Apps/account/model/fixture"
-	"github.com/dolong2110/Memoirization-Apps/account/model/mocks"
-	"github.com/dolong2110/Memoirization-Apps/account/utils"
+	"github.com/dolong2110/memorization-apps/account/model"
+	"github.com/dolong2110/memorization-apps/account/model/apperrors"
+	"github.com/dolong2110/memorization-apps/account/model/fixture"
+	"github.com/dolong2110/memorization-apps/account/model/mocks"
+	"github.com/dolong2110/memorization-apps/account/utils"
+
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"

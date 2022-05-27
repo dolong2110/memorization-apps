@@ -1,8 +1,8 @@
 package middleware
 
 import (
-	"github.com/dolong2110/Memoirization-Apps/account/model"
-	"github.com/dolong2110/Memoirization-Apps/account/model/apperrors"
+	"github.com/dolong2110/memorization-apps/account/model"
+	"github.com/dolong2110/memorization-apps/account/model/apperrors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"strings"

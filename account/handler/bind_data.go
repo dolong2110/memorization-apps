@@ -2,7 +2,7 @@ package handler
 
 import (
 	"fmt"
-	"github.com/dolong2110/Memoirization-Apps/account/model/apperrors"
+	"github.com/dolong2110/memorization-apps/account/model/apperrors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"log"

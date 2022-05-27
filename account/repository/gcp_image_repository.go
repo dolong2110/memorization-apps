@@ -4,8 +4,9 @@ import (
 	"cloud.google.com/go/storage"
 	"context"
 	"fmt"
-	"github.com/dolong2110/Memoirization-Apps/account/model"
-	"github.com/dolong2110/Memoirization-Apps/account/model/apperrors"
+	"github.com/dolong2110/memorization-apps/account/model"
+	"github.com/dolong2110/memorization-apps/account/model/apperrors"
+
 	"io"
 	"log"
 	"mime/multipart"

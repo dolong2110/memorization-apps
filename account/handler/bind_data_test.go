@@ -3,8 +3,9 @@ package handler
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/dolong2110/Memoirization-Apps/account/model/apperrors"
-	"github.com/dolong2110/Memoirization-Apps/account/model/mocks"
+	"github.com/dolong2110/memorization-apps/account/model/apperrors"
+	"github.com/dolong2110/memorization-apps/account/model/mocks"
+
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"

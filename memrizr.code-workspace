@@ -1,10 +1,19 @@
 {
-    "folders": [
-        {
-            "path": "./account"
-        },
-        {
-            "path": "."
-        }
-    ]
+  "folders": [
+    {
+      "name": "account",
+      "path": "account"
+    },
+    {
+      "name": "account-client",
+      "path": "account-client"
+    },
+    {
+      "name": "memorization-apps",
+      "path": "."
+    }
+  ],
+  "settings": {
+    "css.validate": false
+  }
 }

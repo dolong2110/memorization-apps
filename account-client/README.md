@@ -5,3 +5,13 @@ This template should help get you started developing with Vue 3 in Vite. The tem
 ## Recommended IDE Setup
 
 - [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar)
+
+
+## Run
+
+````
+npm run dev -- --host // with vue 7+ need one more "--"
+npm install -D tailwindcss@latest postcss@latest autoprefixer@latest vite # install tailwindcss
+npm install axios vue-router@4 # install axios vue-router
+npx tailwindcss init -p # create 2 config files
+````
