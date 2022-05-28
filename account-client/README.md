@@ -14,4 +14,6 @@ npm run dev -- --host // with vue 7+ need one more "--"
 npm install -D tailwindcss@latest postcss@latest autoprefixer@latest vite # install tailwindcss
 npm install axios vue-router@4 # install axios vue-router
 npx tailwindcss init -p # create 2 config files
+npm install -D eslint eslint-plugin-vue #
+npm install vee-validate@next @vee-validate/rules --save #
 ````

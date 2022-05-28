@@ -1,18 +1,33 @@
 <template>
-  <div class='text-4xl font-bol text-center my-2'>App Component</div>
-  <div class='flex justify-around my-4'>
-    <router-link to='/'>Home/Details</router-link>
-    <router-link to='/authenticate'>Auth</router-link>
-    <router-link to='/notaroute'>Not a Route</router-link>
+  <div class="mx-8 my-8">
+    <Loader
+      v-if="isLoading"
+      :height="512"
+      class="animate-spin stroke-current text-blue-500 mx-auto"
+    />
+    <router-view v-else></router-view>
   </div>
-  <router-view></router-view>
 </template>
 
 <script>
-import { defineComponent } from 'vue';
+import { defineComponent, onMounted } from 'vue';
+import Loader from './components/ui/Loader.vue';
+import { useAuth } from './stores/auth';
 // Wrapping exported object in define component
-// gives us typing help!
+// gives us typing help! Woot!
 export default defineComponent({
   name: 'App',
+  components: {
+    Loader,
+  },
+  setup() {
+    const { initializeUser, isLoading } = useAuth();
+    onMounted(() => {
+      initializeUser();
+    });
+    return {
+      isLoading,
+    };
+  },
 });
 </script>
