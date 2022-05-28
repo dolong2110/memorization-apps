@@ -40,3 +40,11 @@ In here I choose to use pgadmin4
 redis-cli get {uid}:{jti} # jti: token id, uid and jti can be got from refresh token payload
 redis-cli TTL {uid}:{jti} # get the duration time of key in redis
 ````
+
+## Migrate DB
+
+````
+make migrate-create NAME=add_users_table
+make migrate-up // update table
+make migrate-down // revert table
+````
