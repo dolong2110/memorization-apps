@@ -1,0 +1,3 @@
+*.pem
+serviceAccount.json
+.env.dev

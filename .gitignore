@@ -1,6 +1,4 @@
 .idea
-account/.env.dev
 *.pem
 .vscode
-account/serviceAccount.json
 docker-compose.txt

@@ -1,6 +1,6 @@
 module github.com/dolong2110/memorization-apps/account
 
-go 1.16
+go 1.18
 
 require (
 	cloud.google.com/go v0.101.1 // indirect
