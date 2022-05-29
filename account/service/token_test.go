@@ -20,8 +20,8 @@ import (
 )
 
 func TestNewPairFromUser(t *testing.T) {
-	var idExp int64 = 15 * 60
-	var refreshExp int64 = 3 * 24 * 2600
+	var accessTokenExpires int64 = 15 * 60
+	var refreshTokenExpires int64 = 3 * 24 * 2600
 	privateKeyFromPem, _ := ioutil.ReadFile("../rsa_private_test.pem")
 	privateKey, err := jwt.ParseRSAPrivateKeyFromPEM(privateKeyFromPem)
 	if err != nil {
@@ -33,17 +33,24 @@ func TestNewPairFromUser(t *testing.T) {
 		publicKey = &privateKey.PublicKey
 	}
 	secret := "anotsorandomtestsecret"
+	accessTokenInfo := model.AccessTokenInfo{
+		PrivateKey: privateKey,
+		PublicKey:  publicKey,
+		Expires:    accessTokenExpires,
+	}
+
+	refreshTokenInfo := model.RefreshTokenInfo{
+		Secret:  secret,
+		Expires: refreshTokenExpires,
+	}
 
 	mockTokenRepository := new(mocks.MockTokenRepository)
 
 	// instantiate a common token service to be used by all tests
 	tokenService := NewTokenService(&TokenServiceConfig{
-		TokenRepository:       mockTokenRepository,
-		PrivateKey:            privateKey,
-		PublicKey:             publicKey,
-		RefreshSecret:         secret,
-		IDExpirationSecs:      idExp,
-		RefreshExpirationSecs: refreshExp,
+		AccessTokenInfo:  accessTokenInfo,
+		RefreshTokenInfo: refreshTokenInfo,
+		TokenRepository:  mockTokenRepository,
 	})
 
 	// include password to make sure it is not serialized
@@ -132,7 +139,7 @@ func TestNewPairFromUser(t *testing.T) {
 		assert.Empty(t, idTokenClaims.User.Password) // password should never be encoded to json
 
 		expiresAt := time.Unix(idTokenClaims.StandardClaims.ExpiresAt, 0)
-		expectedExpiresAt := time.Now().Add(time.Duration(idExp) * time.Second)
+		expectedExpiresAt := time.Now().Add(time.Duration(accessTokenExpires) * time.Second)
 		assert.WithinDuration(t, expectedExpiresAt, expiresAt, 5*time.Second)
 
 		refreshTokenClaims := &model.RefreshTokenCustomClaims{}
@@ -147,7 +154,7 @@ func TestNewPairFromUser(t *testing.T) {
 		assert.Equal(t, user.UID, refreshTokenClaims.UID)
 
 		expiresAt = time.Unix(refreshTokenClaims.StandardClaims.ExpiresAt, 0)
-		expectedExpiresAt = time.Now().Add(time.Duration(refreshExp) * time.Second)
+		expectedExpiresAt = time.Now().Add(time.Duration(refreshTokenExpires) * time.Second)
 		assert.WithinDuration(t, expectedExpiresAt, expiresAt, 5*time.Second)
 	})
 	t.Run("Error setting refresh token", func(t *testing.T) {
@@ -237,7 +244,7 @@ func TestSignout(t *testing.T) {
 }
 
 func TestValidateIDToken(t *testing.T) {
-	var idExp int64 = 15 * 60
+	var accessTokenExpires int64 = 15 * 60
 
 	privateKeyFromPem, _ := ioutil.ReadFile("../rsa_private_test.pem")
 	privateKey, err := jwt.ParseRSAPrivateKeyFromPEM(privateKeyFromPem)
@@ -252,11 +259,14 @@ func TestValidateIDToken(t *testing.T) {
 
 	inValidPrivateKeyFromPEM, _ := utils.GeneratePrivateKey(2048)
 
+	acccessTokenInfo := model.AccessTokenInfo{
+		PrivateKey: privateKey,
+		PublicKey:  publicKey,
+		Expires:    accessTokenExpires,
+	}
 	// instantiate a common token service to be used by all tests
 	tokenService := NewTokenService(&TokenServiceConfig{
-		PrivateKey:       privateKey,
-		PublicKey:        publicKey,
-		IDExpirationSecs: idExp,
+		AccessTokenInfo: acccessTokenInfo,
 	})
 
 	// include password to make sure it is not serialized
@@ -271,7 +281,7 @@ func TestValidateIDToken(t *testing.T) {
 	t.Run("Valid token", func(t *testing.T) {
 		// maybe not the best approach to depend on utility method
 		// token will be valid for 15 minutes
-		ss, _ := utils.GenerateIDToken(user, privateKey, idExp)
+		ss, _ := utils.GenerateIDToken(user, privateKey, accessTokenExpires)
 
 		uFromToken, err := tokenService.ValidateIDToken(ss)
 		assert.NoError(t, err)
@@ -309,12 +319,15 @@ func TestValidateIDToken(t *testing.T) {
 }
 
 func TestValidateRefreshToken(t *testing.T) {
-	var refreshExp int64 = 3 * 24 * 2600
+	var refreshTokenExpires int64 = 3 * 24 * 2600
 	secret := "anotsorandomtestsecret"
 
+	refreshTokenInfo := model.RefreshTokenInfo{
+		Secret:  secret,
+		Expires: refreshTokenExpires,
+	}
 	tokenService := NewTokenService(&TokenServiceConfig{
-		RefreshSecret:         secret,
-		RefreshExpirationSecs: refreshExp,
+		RefreshTokenInfo: refreshTokenInfo,
 	})
 
 	uid, _ := uuid.NewRandom()
@@ -325,7 +338,7 @@ func TestValidateRefreshToken(t *testing.T) {
 	}
 
 	t.Run("Valid token", func(t *testing.T) {
-		testRefreshToken, _ := utils.GenerateRefreshToken(user.UID, secret, refreshExp)
+		testRefreshToken, _ := utils.GenerateRefreshToken(user.UID, secret, refreshTokenExpires)
 
 		validatedRefreshToken, err := tokenService.ValidateRefreshToken(testRefreshToken.SignedStringToken)
 		assert.NoError(t, err)
@@ -335,7 +348,7 @@ func TestValidateRefreshToken(t *testing.T) {
 	})
 
 	t.Run("invalid signed token", func(t *testing.T) {
-		testRefreshToken, _ := utils.GenerateRefreshToken(user.UID, "secret", refreshExp)
+		testRefreshToken, _ := utils.GenerateRefreshToken(user.UID, "secret", refreshTokenExpires)
 
 		expectedErr := apperrors.NewAuthorization("Unable to verify user from refresh token")
 
