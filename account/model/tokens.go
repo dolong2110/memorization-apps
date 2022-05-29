@@ -27,13 +27,14 @@ type RefreshToken struct {
 	SignedStringToken string    `json:"refresh_token"`
 }
 
-// AccessTokenInfo stores token's initialize information
+// AccessTokenInfo stores access token's initialize information
 type AccessTokenInfo struct {
 	PublicKey  *rsa.PublicKey
 	PrivateKey *rsa.PrivateKey
 	Expires    int64
 }
 
+// RefreshTokenInfo stores refresh token's initialize information
 type RefreshTokenInfo struct {
 	Secret  string
 	Expires int64

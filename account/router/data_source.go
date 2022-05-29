@@ -10,6 +10,7 @@ import (
 	"time"
 )
 
+// DataSources is the struct which contains variables representing data sources
 type DataSources struct {
 	PostgreSQLDB       *sqlx.DB
 	RedisClient        *redis.Client

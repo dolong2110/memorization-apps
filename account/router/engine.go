@@ -9,11 +9,13 @@ import (
 	"time"
 )
 
+// Router is the struct used to init gin-gonic
 type Router struct {
 	config     *Config
 	dataSource *DataSources
 }
 
+// NewRouters is method to init router struct
 func NewRouters(config *Config, dataSources *DataSources) *Router {
 	return &Router{
 		config:     config,
@@ -21,6 +23,7 @@ func NewRouters(config *Config, dataSources *DataSources) *Router {
 	}
 }
 
+// InitGin is a method which receive attributes of router and return *gin.Engine and error
 func (r *Router) InitGin() (*gin.Engine, error) {
 	// initialize data sources
 
