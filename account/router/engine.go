@@ -64,7 +64,7 @@ func (r *Router) InitGin() (*gin.Engine, error) {
 		Engine:          router,
 		UserService:     userService,
 		TokenService:    tokenService,
-		BaseURL:         r.config.ApiUrl,
+		BaseURL:         r.config.AccountAPIURL,
 		TimeoutDuration: time.Duration(r.config.HandlerTimeout) * time.Second,
 		MaxBodyBytes:    r.config.MaxBodyBytes,
 	})

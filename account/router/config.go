@@ -6,7 +6,7 @@ import (
 
 // Config is the struct works as template to parse env variables
 type Config struct {
-	ApiUrl         string     `mapstructure:"ACCOUNT_API_URL" default:"/api/account"`
+	AccountAPIURL  string     `mapstructure:"ACCOUNT_API_URL" default:"/api/account"`
 	Port           string     `mapstructure:"PORT" default:"8080"`
 	MaxBodyBytes   int64      `mapstructure:"MAX_BODY_BYTES" default:"4194304"` // 4MB in Bytes ~ 4 * 1024 * 1024
 	HandlerTimeout int64      `mapstructure:"HANDLER_TIMEOUT" default:"5"`
