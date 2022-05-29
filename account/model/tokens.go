@@ -1,6 +1,7 @@
 package model
 
 import (
+	"crypto/rsa"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/google/uuid"
 	"time"
@@ -8,8 +9,14 @@ import (
 
 // Token used for returning pairs of id and refresh tokens
 type Token struct {
-	IDToken
+	AccessToken
 	RefreshToken
+}
+
+// AccessToken stores token properties that
+// are accessed in multiple application layers
+type AccessToken struct {
+	SignedStringToken string `json:"id_token"`
 }
 
 // RefreshToken stores token properties that
@@ -20,15 +27,29 @@ type RefreshToken struct {
 	SignedStringToken string    `json:"refresh_token"`
 }
 
-// IDToken stores token properties that
-// are accessed in multiple application layers
-type IDToken struct {
-	SignedStringToken string `json:"id_token"`
+// AccessTokenInfo stores token's initialize information
+type AccessTokenInfo struct {
+	PublicKey  *rsa.PublicKey
+	PrivateKey *rsa.PrivateKey
+	Expires    int64
 }
 
-// IDTokenCustomClaims holds structure of jwt claims of idToken
-type IDTokenCustomClaims struct {
+type RefreshTokenInfo struct {
+	Secret  string
+	Expires int64
+}
+
+// AccessTokenCustomClaims holds structure of jwt claims of idToken
+type AccessTokenCustomClaims struct {
 	User *User `json:"user"`
+	jwt.StandardClaims
+}
+
+// RefreshTokenCustomClaims holds the payload of a refresh token
+// This can be used to extract user id for subsequent
+// application operations (IE, fetch user in Redis)
+type RefreshTokenCustomClaims struct {
+	UID uuid.UUID `json:"uid"`
 	jwt.StandardClaims
 }
 
@@ -38,12 +59,4 @@ type RefreshTokenData struct {
 	SignedStringToken string
 	ID                uuid.UUID
 	ExpiresIn         time.Duration
-}
-
-// RefreshTokenCustomClaims holds the payload of a refresh token
-// This can be used to extract user id for subsequent
-// application operations (IE, fetch user in Redis)
-type RefreshTokenCustomClaims struct {
-	UID uuid.UUID `json:"uid"`
-	jwt.StandardClaims
 }

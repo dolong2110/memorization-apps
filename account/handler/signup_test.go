@@ -199,7 +199,7 @@ func TestSignup(t *testing.T) {
 		}
 
 		mockTokenResp := &model.Token{
-			IDToken:      model.IDToken{SignedStringToken: "idToken"},
+			AccessToken:  model.AccessToken{SignedStringToken: "idToken"},
 			RefreshToken: model.RefreshToken{SignedStringToken: "refreshToken"},
 		}
 

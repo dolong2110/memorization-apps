@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/dolong2110/memorization-apps/account/router"
 	"log"
 	"net/http"
 	"os"
@@ -13,20 +14,27 @@ func main() {
 	// you could insert your favorite logger here for structured or leveled logging
 	log.Println("Starting server...")
 
-	// initialize data sources
-	ds, err := initDS()
+	// load configs
+	config, err := router.GetConfig(".", "dev", "json")
+	if err != nil {
+		log.Fatalf("Failed to get config: %v\n", err)
+	}
+
+	ds, err := router.InitDS(config)
 	if err != nil {
 		log.Fatalf("Unable to initialize data sources: %v\n", err)
 	}
 
-	router, err := inject(ds)
+	r := router.NewRouters(config, ds)
+
+	engine, err := r.InitGin()
 	if err != nil {
-		log.Fatalf("Failure to inject data sources: %v\n", err)
+		log.Fatalf("Failed to init gin: %v\n", err)
 	}
 
 	srv := &http.Server{
-		Addr:    ":8080",
-		Handler: router,
+		Addr:    ":" + config.Port,
+		Handler: engine,
 	}
 
 	// Graceful server shutdown - https://github.com/gin-gonic/examples/blob/master/graceful-shutdown/graceful-shutdown/server.go
@@ -53,7 +61,7 @@ func main() {
 	defer cancel()
 
 	// shutdown data sources
-	if err := ds.close(); err != nil {
+	if err := ds.Close(); err != nil {
 		log.Fatalf("A problem occurred gracefully shutting down data sources: %v\n", err)
 	}
 

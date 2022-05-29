@@ -217,7 +217,7 @@ func TestTokens(t *testing.T) {
 		mockNewTokenID, _ := uuid.NewRandom()
 		mockNewUserID, _ := uuid.NewRandom()
 		mockTokenPairResp := &model.Token{
-			IDToken: model.IDToken{SignedStringToken: "aNewIDToken"},
+			AccessToken: model.AccessToken{SignedStringToken: "aNewIDToken"},
 			RefreshToken: model.RefreshToken{
 				SignedStringToken: "aNewRefreshToken",
 				ID:                mockNewTokenID,

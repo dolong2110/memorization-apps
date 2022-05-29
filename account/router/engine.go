@@ -1,18 +1,70 @@
 package router
 
-type config struct {
-	DataSource DataSource `mapstructure:"DATA_SOURCE"`
+import (
+	"github.com/dolong2110/memorization-apps/account/handler"
+	"github.com/dolong2110/memorization-apps/account/repository"
+	"github.com/dolong2110/memorization-apps/account/service"
+	"github.com/gin-gonic/gin"
+	"log"
+	"time"
+)
+
+type Router struct {
+	config     *Config
+	dataSource *DataSources
 }
 
-type DataSource struct {
-	DataBase PostGreSQL `mapstructure:"POST_GRESQL"`
+func NewRouters(config *Config, dataSources *DataSources) *Router {
+	return &Router{
+		config:     config,
+		dataSource: dataSources,
+	}
 }
 
-type PostGreSQL struct {
-	PostGresHost     string `mapstructure:"POSTGRES_HOST" default:"postgres-account"`
-	PostGresPort     int    `mapstructure:"POSTGRES_PORT" default:"5432"`
-	PostGresUser     string `mapstructure:"POSTGRES_USER" default:"postgres"`
-	PostGresPassword string `mapstructure:"POSTGRES_PASSWORD" required:"true"`
-	PostGresDB       string `mapstructure:"POSTGRES_DB" default:"postgres"`
-	PostGresSSL      string `mapstructure:"POSTGRES_SSL" default:"disable"`
+func (r *Router) InitGin() (*gin.Engine, error) {
+	// initialize data sources
+
+	log.Println("Injecting data sources")
+
+	/*
+	 * repository layer
+	 */
+	userRepository := repository.NewUserRepository(r.dataSource.PostgreSQLDB)
+	tokenRepository := repository.NewTokenRepository(r.dataSource.RedisClient)
+	imageRepository := repository.NewImageRepository(r.dataSource.CloudStorageClient, r.config.DataSource.GCP.GCPImageBucket)
+
+	/*
+	 * service layer
+	 */
+	userService := service.NewUserService(&service.USConfig{
+		UserRepository:  userRepository,
+		ImageRepository: imageRepository,
+	})
+
+	tokenConfig := r.config.Token
+	accessTokenInfo, err := initAccessToken(tokenConfig.AccessToken)
+	if err != nil {
+		log.Fatalf("could not get access token information: %v\n", err)
+	}
+	refreshTokenInfo := initRefreshToken(tokenConfig.RefreshToken)
+
+	tokenService := service.NewTokenService(&service.TokenServiceConfig{
+		AccessTokenInfo:  *accessTokenInfo,
+		RefreshTokenInfo: *refreshTokenInfo,
+		TokenRepository:  tokenRepository,
+	})
+
+	// initialize gin.Engine
+	router := gin.Default()
+
+	handler.NewHandler(&handler.Config{
+		Engine:          router,
+		UserService:     userService,
+		TokenService:    tokenService,
+		BaseURL:         r.config.ApiUrl,
+		TimeoutDuration: time.Duration(r.config.HandlerTimeout) * time.Second,
+		MaxBodyBytes:    r.config.MaxBodyBytes,
+	})
+
+	return router, nil
 }

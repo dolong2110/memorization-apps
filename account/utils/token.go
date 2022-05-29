@@ -13,13 +13,13 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
-// GenerateIDToken generates an IDToken which is a jwt with myCustomClaims
+// GenerateIDToken generates an AccessToken which is a jwt with myCustomClaims
 // Could call this GenerateIDTokenString, but the signature makes this fairly clear
 func GenerateIDToken(user *model.User, key *rsa.PrivateKey, exp int64) (string, error) {
 	unixTime := time.Now().Unix()
 	tokenExp := unixTime + exp
 
-	claims := model.IDTokenCustomClaims{
+	claims := model.AccessTokenCustomClaims{
 		User: user,
 		StandardClaims: jwt.StandardClaims{
 			IssuedAt:  unixTime,
@@ -72,8 +72,8 @@ func GenerateRefreshToken(uid uuid.UUID, key string, exp int64) (*model.RefreshT
 }
 
 // ValidateIDToken returns the token's claims if the token is valid
-func ValidateIDToken(tokenString string, key *rsa.PublicKey) (*model.IDTokenCustomClaims, error) {
-	claims := &model.IDTokenCustomClaims{}
+func ValidateIDToken(tokenString string, key *rsa.PublicKey) (*model.AccessTokenCustomClaims, error) {
+	claims := &model.AccessTokenCustomClaims{}
 
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
 		return key, nil
@@ -86,7 +86,7 @@ func ValidateIDToken(tokenString string, key *rsa.PublicKey) (*model.IDTokenCust
 		return nil, fmt.Errorf("ID token is invalid")
 	}
 
-	claims, ok := token.Claims.(*model.IDTokenCustomClaims)
+	claims, ok := token.Claims.(*model.AccessTokenCustomClaims)
 	if !ok {
 		return nil, fmt.Errorf("ID token valid but couldn't parse claims")
 	}

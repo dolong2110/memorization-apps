@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"crypto/rsa"
 	"github.com/dolong2110/memorization-apps/account/model"
 	"github.com/dolong2110/memorization-apps/account/model/apperrors"
 	"github.com/dolong2110/memorization-apps/account/utils"
@@ -15,35 +14,26 @@ import (
 // for use in service methods along with keys and secrets for
 // signing JWTs
 type tokenService struct {
-	TokenRepository       model.TokenRepository
-	PrivateKey            *rsa.PrivateKey
-	PublicKey             *rsa.PublicKey
-	RefreshSecret         string
-	IDExpirationSecs      int64
-	RefreshExpirationSecs int64
+	AccessToken     model.AccessTokenInfo
+	RefreshToken    model.RefreshTokenInfo
+	TokenRepository model.TokenRepository
 }
 
 // TokenServiceConfig will hold repositories that will eventually be injected into
 // this service layer
 type TokenServiceConfig struct {
-	TokenRepository       model.TokenRepository
-	PrivateKey            *rsa.PrivateKey
-	PublicKey             *rsa.PublicKey
-	RefreshSecret         string
-	IDExpirationSecs      int64
-	RefreshExpirationSecs int64
+	AccessTokenInfo  model.AccessTokenInfo
+	RefreshTokenInfo model.RefreshTokenInfo
+	TokenRepository  model.TokenRepository
 }
 
 // NewTokenService is a factory function for
 // initializing a UserService with its repository layer dependencies
 func NewTokenService(c *TokenServiceConfig) model.TokenService {
 	return &tokenService{
-		TokenRepository:       c.TokenRepository,
-		PrivateKey:            c.PrivateKey,
-		PublicKey:             c.PublicKey,
-		RefreshSecret:         c.RefreshSecret,
-		IDExpirationSecs:      c.IDExpirationSecs,
-		RefreshExpirationSecs: c.RefreshExpirationSecs,
+		AccessToken:     c.AccessTokenInfo,
+		RefreshToken:    c.RefreshTokenInfo,
+		TokenRepository: c.TokenRepository,
 	}
 }
 
@@ -60,13 +50,13 @@ func (s *tokenService) NewPairFromUser(ctx context.Context, user *model.User, pr
 	}
 
 	// No need to use a repository for idToken as it is unrelated to any data source
-	idToken, err := utils.GenerateIDToken(user, s.PrivateKey, s.IDExpirationSecs)
+	idToken, err := utils.GenerateIDToken(user, s.AccessToken.PrivateKey, s.AccessToken.Expires)
 	if err != nil {
 		log.Printf("Error generating idToken for uid: %v. Error: %v\n", user.UID, err.Error())
 		return nil, apperrors.NewInternal()
 	}
 
-	refreshToken, err := utils.GenerateRefreshToken(user.UID, s.RefreshSecret, s.RefreshExpirationSecs)
+	refreshToken, err := utils.GenerateRefreshToken(user.UID, s.RefreshToken.Secret, s.RefreshToken.Expires)
 	if err != nil {
 		log.Printf("Error generating refreshToken for uid: %v. Error: %v\n", user.UID, err.Error())
 		return nil, apperrors.NewInternal()
@@ -79,7 +69,7 @@ func (s *tokenService) NewPairFromUser(ctx context.Context, user *model.User, pr
 	}
 
 	return &model.Token{
-		IDToken:      model.IDToken{SignedStringToken: idToken},
+		AccessToken:  model.AccessToken{SignedStringToken: idToken},
 		RefreshToken: model.RefreshToken{SignedStringToken: refreshToken.SignedStringToken, ID: refreshToken.ID, UID: user.UID},
 	}, nil
 }
@@ -90,9 +80,9 @@ func (s *tokenService) Signout(ctx context.Context, uid uuid.UUID) error {
 }
 
 // ValidateIDToken validates the id token jwt string
-// It returns the user extract from the IDTokenCustomClaims
+// It returns the user extract from the AccessTokenCustomClaims
 func (s *tokenService) ValidateIDToken(tokenString string) (*model.User, error) {
-	claims, err := utils.ValidateIDToken(tokenString, s.PublicKey) // uses public RSA key
+	claims, err := utils.ValidateIDToken(tokenString, s.AccessToken.PublicKey) // uses public RSA key
 	// We'll just return unauthorized error in all instances of failing to verify user
 	if err != nil {
 		log.Printf("Unable to validate or parse idToken - Error: %v\n", err)
@@ -106,7 +96,7 @@ func (s *tokenService) ValidateIDToken(tokenString string) (*model.User, error) 
 // and returns a RefreshToken if valid
 func (s *tokenService) ValidateRefreshToken(tokenString string) (*model.RefreshToken, error) {
 	// validate actual JWT with string a secret
-	claims, err := utils.ValidateRefreshToken(tokenString, s.RefreshSecret)
+	claims, err := utils.ValidateRefreshToken(tokenString, s.RefreshToken.Secret)
 	// We'll just return unauthorized error in all instances of failing to verify user
 	if err != nil {
 		log.Printf("Unable to validate or parse refreshToken for token string: %s\n%v\n", tokenString, err)

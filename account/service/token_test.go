@@ -100,13 +100,13 @@ func TestNewPairFromUser(t *testing.T) {
 		mockTokenRepository.AssertCalled(t, "DeleteRefreshToken", deleteWithPrevIDArguments...)
 
 		var s string
-		assert.IsType(t, s, tokenPair.IDToken.SignedStringToken)
+		assert.IsType(t, s, tokenPair.AccessToken.SignedStringToken)
 
 		// decode the Base64URL encoded string
 		// simpler to use jwt library which is already imported
-		idTokenClaims := &model.IDTokenCustomClaims{}
+		idTokenClaims := &model.AccessTokenCustomClaims{}
 
-		_, err = jwt.ParseWithClaims(tokenPair.IDToken.SignedStringToken, idTokenClaims, func(token *jwt.Token) (interface{}, error) {
+		_, err = jwt.ParseWithClaims(tokenPair.AccessToken.SignedStringToken, idTokenClaims, func(token *jwt.Token) (interface{}, error) {
 			return publicKey, nil
 		})
 
@@ -283,7 +283,7 @@ func TestValidateIDToken(t *testing.T) {
 		)
 	})
 
-	t.Run("Expired token", func(t *testing.T) {
+	t.Run("Expires token", func(t *testing.T) {
 		// maybe not the best approach to depend on utility method
 		// token will be valid for 15 minutes
 		ss, _ := utils.GenerateIDToken(user, privateKey, -1) // expires one second ago
@@ -343,7 +343,7 @@ func TestValidateRefreshToken(t *testing.T) {
 		assert.EqualError(t, err, expectedErr.Message)
 	})
 
-	t.Run("Expired token", func(t *testing.T) {
+	t.Run("Expires token", func(t *testing.T) {
 		testRefreshToken, _ := utils.GenerateRefreshToken(user.UID, secret, -1)
 
 		expectedErr := apperrors.NewAuthorization("Unable to verify user from refresh token")
