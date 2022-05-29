@@ -1,4 +1,4 @@
-package words
+package main
 
 import (
 	"context"
@@ -29,7 +29,7 @@ func init() {
 func main() {
 	log.Println("Starting server...")
 
-	config, err := router.GetConfig(".", ".env", "dev")
+	config, err := router.GetConfig("./router", "dev", "json")
 	if err != nil {
 		log.Fatalf("Failed to get configs %v\n", err)
 	}

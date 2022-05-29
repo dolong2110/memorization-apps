@@ -1,2 +1,2 @@
-.env.dev
 *.pem
+./router/dev.json
