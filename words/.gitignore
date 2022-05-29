@@ -1,2 +1,5 @@
-*.pem
-./router/dev.json
+node_modules
+dist
+rsa_public.pem
+.env.dev
+wordmem-serviceAccount.*

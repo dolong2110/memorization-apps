@@ -28,6 +28,18 @@ services:
             - "pgdata_account:/var/lib/postgresql/data"
             # - ./init:/docker-entrypoint-initdb.d/
         command: ["postgres", "-c", "log_statement=all"]
+    postgres-words:
+        image: "postgres:alpine"
+        environment:
+            - POSTGRES_PASSWORD=password
+        ports:
+            - "5433:5432"
+        #   Set a volume for data and initial sql script
+        #   May configure initial db for future demo
+        volumes:
+            - "pgdata_words:/var/lib/postgresql/data"
+            # - ./init:/docker-entrypoint-initdb.d/
+        command: [ "postgres", "-c", "log_statement=all" ]
     redis-account:
         image: "redis:alpine"
         ports:
@@ -71,6 +83,40 @@ services:
             - /app/node_modules #avoid overwriting node_modules
         depends_on:
             - reverse-proxy
+    words:
+        build:
+            # build from build stage of dockerfile in words directory
+            context: ./words
+            target: builder
+        image: words # if we don't give image name, traefik won't create router 🤷‍♂️
+        expose:
+            - "8080" # seems necessary for Traefik to have internal expose of port
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.words.rule=Host(`wordmem.test`) && PathPrefix(`/api/words`)"
+        volumes:
+            - ./words:/app
+        depends_on:
+            - postgres-words
+        environment:
+            - NODE_ENV=dev
+        command: [ "npm", "run", "dev" ]
+    word-client:
+        build:
+            context: ./word-client
+        image: word-client # if we don't give image name, traefik won't create router 🤷‍♂️
+        stdin_open: true # required with react-scripts > 3.4
+        expose:
+            - "3000"
+        ports:
+            - "3003:3000"
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.word-client.rule=Host(`wordmem.test`)"
+        volumes:
+            - ./word-client:/app
+            - /app/node_modules
 volumes:
     pgdata_account:
+    pgdata_words:
     redisdata:

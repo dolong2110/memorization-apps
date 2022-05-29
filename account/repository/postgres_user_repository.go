@@ -72,7 +72,7 @@ func (r *pGUserRepository) FindByID(ctx context.Context, uid uuid.UUID) (*model.
 // Update updates a user's properties
 func (r *pGUserRepository) Update(ctx context.Context, user *model.User) error {
 	query := `
-		UPDATE users 
+		UPDATE users
 		SET name=:name, email=:email, website=:website
 		WHERE uid=:uid
 		RETURNING *;

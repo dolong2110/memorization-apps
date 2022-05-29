@@ -1,0 +1,14 @@
+$navbar-height: 4.5rem;
+$tablet: 768px;
+
+@import "~bulma/bulma.sass";
+
+.navbar-item {
+  img {
+    max-height: 48px;
+  }
+}
+
+.navbar-end {
+  padding-right: 1.5rem;
+}
