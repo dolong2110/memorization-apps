@@ -48,3 +48,8 @@ make migrate-create NAME=add_users_table
 make migrate-up // update table
 make migrate-down // revert table
 ````
+
+
+## References
+
+https://github.com/JacobSNGoodwin/memrizr

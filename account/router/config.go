@@ -70,5 +70,8 @@ func GetConfig(path string, name string, fileType string) (*Config, error) {
 	}
 
 	err = viper.Unmarshal(&config)
+	if err != nil {
+		return nil, err
+	}
 	return config, nil
 }
