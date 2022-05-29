@@ -23,7 +23,7 @@ const App: React.FC = () => {
 
   // since the auth state's isLoading is initially false, we need to make
   // sure we also initiating the auth state check (getUser) before loading routes
-  // we could also create a config array of routs that could be shared betwen this and
+  // we could also create a config array of routs that could be shared between this and
   // the navbar
   const routes =
     beginUserLoad && !isLoading ? (

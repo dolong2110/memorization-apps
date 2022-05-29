@@ -46,7 +46,7 @@ export class PGWordRepository implements WordRepository {
     offset: number;
     isFibo: boolean;
   }): Promise<WordListResponse> {
-    // query to retun count with results
+    // query to return count with results
     const isFiboText = options.isFibo
       ? "AND EXTRACT(DAY FROM CURRENT_TIMESTAMP - start_date) in (1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233)"
       : "";
